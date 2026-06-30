@@ -1,0 +1,28 @@
+﻿
+
+namespace AirlineReservationSystem.Data.Configurations;
+
+public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
+{
+    public void Configure(EntityTypeBuilder<Ticket> builder)
+    {
+        builder.ToTable("Tickets");
+
+        builder.HasKey(t => t.Id);
+
+        builder.Property(t => t.TicketNumber)
+               .HasMaxLength(30)
+               .IsRequired();
+
+        builder.HasIndex(t => t.TicketNumber)
+               .IsUnique();
+
+        builder.HasOne(t => t.Booking)
+               .WithMany(b => b.Tickets)
+               .HasForeignKey(t => t.BookingId);
+
+        builder.HasOne(t => t.Passenger)
+               .WithMany()
+               .HasForeignKey(t => t.PassengerId);
+    }
+}
