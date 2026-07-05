@@ -14,6 +14,8 @@ public class Booking : AuditableEntity
 
     public BookingStatus Status { get; set; }
 
+    // Navigation
+
     public ApplicationUser User { get; set; } = null!;
 
     public Flight Flight { get; set; } = null!;
@@ -24,9 +26,4 @@ public class Booking : AuditableEntity
     public ICollection<Payment> Payments { get; set; }
         = new HashSet<Payment>();
 
-    public ICollection<Ticket> Tickets { get; set; }
-        = new HashSet<Ticket>();
-
-    public ICollection<Baggage> Baggages { get; set; }
-        = new HashSet<Baggage>();
 }

@@ -36,8 +36,8 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IAirportRepository, AirportRepository>();
             builder.Services.AddScoped<IFlightRepository, FlightRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();            
 
             var app = builder.Build();
 
