@@ -2,7 +2,7 @@
 
 namespace AirlineReservationSystem.Models.Entities;
 
-public class Seat : AuditableEntity
+public class Seat : AuditableEntity //المقعد داخل الطائرة، له رقم، نوع، وحالة."static seat"
 {
     public int AircraftId { get; set; }
 

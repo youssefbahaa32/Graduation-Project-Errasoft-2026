@@ -4,7 +4,7 @@ namespace AirlineReservationSystem.Models.Entities;
 
 public class Baggage : AuditableEntity
 {
-    public int BookingId { get; set; }
+    public int PassengerId { get; set; }
 
     public BaggageType Type { get; set; }
 
@@ -12,5 +12,5 @@ public class Baggage : AuditableEntity
 
     public decimal Price { get; set; }
 
-    public Booking Booking { get; set; } = null!;
+    public Passenger Passenger { get; set; } = null!;
 }
