@@ -13,7 +13,7 @@ public class BookingPassenger : AuditableEntity //راكبًا داخل حجز �
 
     public Passenger Passenger { get; set; } = null!;
 
-    public FlightSeat FlightSeat { get; set; } = null!; //كل راكب يجلس في مقعد مختلف
+    public FlightSeat FlightSeat { get; set; } = null!; 
 
     public Ticket? Ticket { get; set; }//لأن التذكرة تخص راكبًا معينًا داخل حجز معين وعلى مقعد معين.
 }
