@@ -27,4 +27,5 @@ public class Flight : AuditableEntity
     public Airport ArrivalAirport { get; set; } = null!;
 
     public ICollection<FlightSeat> FlightSeats { get; set; } = new HashSet<FlightSeat>();
+    public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
 }
