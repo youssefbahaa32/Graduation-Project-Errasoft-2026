@@ -29,6 +29,14 @@
 
 	</ItemGroup>
 	<ItemGroup>
+	  <Folder Include="Areas\Admin\Controllers\" />
+	  <Folder Include="Areas\Admin\Views\" />
+	  <Folder Include="Areas\Chat\Controllers\" />
+	  <Folder Include="Areas\Chat\Views\" />
+	  <Folder Include="Areas\Identity\Controllers\" />
+	  <Folder Include="Areas\Identity\Views\" />
+	  <Folder Include="Areas\Customer\Controllers\" />
+	  <Folder Include="Areas\Customer\Views\" />
 	  <Folder Include="Data\Seeding\" />
 	  <Folder Include="Data\Migrations\" />
 	  <Folder Include="Services\Implementations\" />

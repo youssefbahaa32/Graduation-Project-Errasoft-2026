@@ -27,5 +27,19 @@ public class PassengerConfiguration : IEntityTypeConfiguration<Passenger>
 
         builder.HasIndex(p => p.PassportNumber)
                .IsUnique();
+        builder.Property(p => p.Nationality)
+              .HasMaxLength(100)
+              .IsRequired();
+
+        builder.Property(p => p.Gender)
+               .IsRequired();
+
+        builder.Property(p => p.DateOfBirth)
+               .IsRequired();
+        builder.HasMany(p => p.BookingPassengers)
+               .WithOne(bp => bp.Passenger)
+               .HasForeignKey(bp => bp.PassengerId)
+               .OnDelete(DeleteBehavior.Cascade);
+        
     }
 }

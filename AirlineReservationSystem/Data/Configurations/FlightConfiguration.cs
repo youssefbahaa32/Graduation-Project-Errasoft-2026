@@ -15,11 +15,6 @@
 
         builder.HasIndex(f => f.FlightNumber);
 
-        builder.HasOne(f => f.Aircraft)
-               .WithMany(a => a.Flights)
-               .HasForeignKey(f => f.AircraftId)
-               .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne(f => f.DepartureAirport)
                .WithMany(a => a.DepartureFlights)
                .HasForeignKey(f => f.DepartureAirportId)
@@ -29,5 +24,14 @@
                .WithMany(a => a.ArrivalFlights)
                .HasForeignKey(f => f.ArrivalAirportId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(f => f.Aircraft)
+               .WithMany(a => a.Flights)
+               .HasForeignKey(f => f.AircraftId)
+               .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(f => f.FlightSeats)
+               .WithOne(fs => fs.Flight)
+               .HasForeignKey(fs => fs.FlightId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

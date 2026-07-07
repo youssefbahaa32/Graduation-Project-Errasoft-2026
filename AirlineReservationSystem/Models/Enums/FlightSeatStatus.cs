@@ -1,6 +1,6 @@
 ﻿namespace AirlineReservationSystem.Models.Enums;
 
-public enum SeatStatus
+public enum FlightSeatStatus
 {
     Available = 1,
     Reserved = 2,

@@ -26,8 +26,17 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
                .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(b => b.Flight)
-               .WithMany()
-               .HasForeignKey(b => b.FlightId)
-               .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(f => f.Bookings)
+                .HasForeignKey(b => b.FlightId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(b=>b.BookingPassengers)
+               .WithOne(bp => bp.Booking)
+               .HasForeignKey(bp => bp.BookingId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(b => b.Payment)
+       .WithOne(p => p.Booking)
+       .HasForeignKey<Payment>(p => p.BookingId);
     }
 }

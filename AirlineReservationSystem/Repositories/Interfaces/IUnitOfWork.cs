@@ -8,6 +8,6 @@
 
         IBookingRepository Bookings { get; }
 
-        Task<int> CompleteAsync();
+        Task<int> SaveChangesAsync();
     }
 }

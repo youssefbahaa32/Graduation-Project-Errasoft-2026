@@ -10,9 +10,11 @@ public class FlightSeat : AuditableEntity// حالة المقعد في الرح�
 
     public decimal Price { get; set; } // Price of the seat for this specific flight سعر في رحله معينه مش في كل الرحلات
 
-    public SeatStatus Status { get; set; }
-
+    public FlightSeatStatus Status { get; set; }
+    // Navigation properties
     public Flight Flight { get; set; } = null!;
-
     public Seat Seat { get; set; } = null!;
+    public ICollection<BookingPassenger> BookingPassenger { get; set; }
+    = new HashSet<BookingPassenger>();
+
 }
