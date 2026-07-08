@@ -16,8 +16,8 @@ public class BaggageConfiguration : IEntityTypeConfiguration<Baggage>
         builder.Property(b => b.Price)
                .HasColumnType("decimal(18,2)");
 
-        builder.HasOne(b => b.Booking)
+        builder.HasOne(p => p.Passenger)
                .WithMany(bk => bk.Baggages)
-               .HasForeignKey(b => b.BookingId);
+               .HasForeignKey(p => p.PassengerId);
     }
 }
