@@ -13,13 +13,8 @@ namespace AirlineReservationSystem.Repositories.Implementations
         {
             _context = context;
             _dbSet = context.Set<T>();
-        }
-
-        public async Task<IEnumerable<T>> GetAllAsync()
-            => await _dbSet.ToListAsync();
-
-        public async Task<T?> GetByIdAsync(int id)
-            => await _dbSet.FindAsync(id);
+        }  
+        
 
         public async Task AddAsync(T entity)
             => await _dbSet.AddAsync(entity);
@@ -32,5 +27,35 @@ namespace AirlineReservationSystem.Repositories.Implementations
 
         public async Task SaveAsync()
             => await _context.SaveChangesAsync();
+        
+
+        public async Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>?[]? includes = null,
+            bool tracked = true) // Get All
+        {
+            var entities = _dbSet.AsQueryable();
+
+            if (expression is not null)
+                entities = entities.Where(expression);
+
+            if (includes is not null)
+                foreach (var item in includes)
+                    if (item is not null)
+                        entities = entities.Include(item);
+
+            if (!tracked)
+                entities = entities.AsNoTracking();
+
+            return await entities.ToListAsync();
+        }
+
+       public async Task<T?> GetOneAsync(
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>?[]? includes = null,
+            bool tracked = true)
+        {
+            return (await GetAsync(expression, includes, tracked)).FirstOrDefault();
+        }
     }
 }
