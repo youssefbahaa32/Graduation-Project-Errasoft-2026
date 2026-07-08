@@ -17,12 +17,10 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.HasIndex(t => t.TicketNumber)
                .IsUnique();
 
-        builder.HasOne(t => t.Booking)
-               .WithMany(b => b.Tickets)
-               .HasForeignKey(t => t.BookingId);
+        builder.HasOne(t => t.BookingPassenger)
+               .WithOne(b => b.Ticket)
+               .HasForeignKey<Ticket>(t => t.BookingPassengerId);
 
-        builder.HasOne(t => t.Passenger)
-               .WithMany()
-               .HasForeignKey(t => t.PassengerId);
+
     }
 }
