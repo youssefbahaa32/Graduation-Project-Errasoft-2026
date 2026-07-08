@@ -55,7 +55,7 @@ namespace AirlineReservationSystem.Repositories.Implementations
             Expression<Func<T, object>>?[]? includes = null,
             bool tracked = true)
         {
-            return (await GetAsync(expression, includes, tracked)).FirstOrDefault();
+            return (await GetAllAsync(expression, includes, tracked)).FirstOrDefault();
         }
     }
 }
