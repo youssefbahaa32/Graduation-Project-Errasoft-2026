@@ -44,14 +44,16 @@ namespace AirlineReservationSystem.Repositories.Implementations
             => filter == null
                 ? await _dbSet.CountAsync(cancellationToken)
                 : await _dbSet.CountAsync(filter, cancellationToken);
-
         public async Task<IEnumerable<T>> GetPagedAsync(
             int pageNumber,
-            int pageSize)
+            int pageSize,
+            CancellationToken cancellationToken = default)
             => await _dbSet
                 .Skip(( pageNumber - 1 ) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
+
+
         // Create
         public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
             => await _dbSet.AddAsync(entity, cancellationToken);
@@ -62,7 +64,6 @@ namespace AirlineReservationSystem.Repositories.Implementations
         // Update
         public void Update(T entity)
             => _dbSet.Update(entity);
-
         public void UpdateRange(IEnumerable<T> entities)
             => _dbSet.UpdateRange(entities);
 
@@ -88,16 +89,14 @@ namespace AirlineReservationSystem.Repositories.Implementations
 
             if (filter != null)
                 query = query.Where(filter);
-            
+
             if (orderBy != null)
                 query = orderBy(query);
 
             if (include != null)
                 query = include(query);
 
-            if (ignoreQueryFilters)
-                query = query.IgnoreQueryFilters();
-            return (query);
+            return query;
         }
     }
 }

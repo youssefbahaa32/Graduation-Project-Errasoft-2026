@@ -31,7 +31,8 @@ namespace AirlineReservationSystem.Repositories.Interfaces
 
         Task<IEnumerable<T>> GetPagedAsync(
             int pageNumber,
-            int pageSize);
+            int pageSize,
+            CancellationToken cancellationToken = default);
         // Create
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
@@ -44,7 +45,6 @@ namespace AirlineReservationSystem.Repositories.Interfaces
 
         // Delete
         void Delete(T entity);
-
         void DeleteRange(IEnumerable<T> entities);
     }
 }
