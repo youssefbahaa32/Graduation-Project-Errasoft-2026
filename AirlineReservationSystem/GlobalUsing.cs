@@ -16,6 +16,12 @@ global using AirlineReservationSystem.Repositories.Interfaces;
 //global using AirlineReservationSystem.Repositories.IRepository;
 //global using AirlineReservationSystem.Services;
 //global using AirlineReservationSystem.Services.IServices;
+//VM
+global using AirlineReservationSystem.ViewModels.Airport;
+global using AirlineReservationSystem.ViewModels.Aircraft;
+global using AirlineReservationSystem.ViewModels.Seat;
+global using AirlineReservationSystem.ViewModels.Flight;
+global using AutoMapper;
 global using Microsoft.AspNetCore.Identity.UI.Services;
 global using Azure.Core;
 global using System.Net.Sockets;
