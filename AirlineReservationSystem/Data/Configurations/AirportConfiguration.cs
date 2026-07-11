@@ -30,6 +30,8 @@ public class AirportConfiguration : IEntityTypeConfiguration<Airport>
                .IsRequired()
                .HasMaxLength(4);
 
+      
+
         builder.HasIndex(a => a.IATACode).IsUnique();
 
         builder.HasIndex(a => a.ICAOCode).IsUnique();

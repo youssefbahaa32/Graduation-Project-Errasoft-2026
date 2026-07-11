@@ -1,11 +1,6 @@
 ﻿namespace AirlineReservationSystem.Repositories.Implementations
 {
-    public class AirportRepository : IAirportRepository
+    public class AirportRepository
     {
-        protected readonly ApplicationDbContext _context;
-        public AirportRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
     }
 }

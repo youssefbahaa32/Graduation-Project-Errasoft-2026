@@ -13,6 +13,13 @@ global using Microsoft.AspNetCore.Identity;
 global using AirlineReservationSystem.Data;
 global using AirlineReservationSystem.Repositories.Implementations;
 global using AirlineReservationSystem.Repositories.Interfaces;
+global using AirlineReservationSystem.Services.Interfaces;
+global using AirlineReservationSystem.Services.Implementations;
+global using Microsoft.Data.SqlClient;
+global using AirlineReservationSystem.ViewModels.AirportVM;
+global using System.Linq.Expressions;
+global using AirlineReservationSystem.Queries;
+
 //global using AirlineReservationSystem.Repositories.IRepository;
 //global using AirlineReservationSystem.Services;
 //global using AirlineReservationSystem.Services.IServices;
@@ -42,7 +49,6 @@ global using System.Diagnostics;
 global using System.Linq;
 global using System.Reflection;
 global using System.Threading.Tasks;
-global using System.Linq.Expressions;
 
 //
 global using Mapster;

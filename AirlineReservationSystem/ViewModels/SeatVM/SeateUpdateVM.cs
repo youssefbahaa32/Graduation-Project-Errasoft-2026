@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace AirlineReservationSystem.ViewModels.Seat
 {
     public class SeatUpdateVM
@@ -16,5 +18,6 @@ namespace AirlineReservationSystem.ViewModels.Seat
         [Required]
         [Display(Name = "Seat Class")]
         public SeatClass SeatClass { get; set; }
+        public IEnumerable<SelectListItem> Aircrafts { get; set; } = [];//عباره عن لستة من الطائرات المتاحه في النظام
     }
 }

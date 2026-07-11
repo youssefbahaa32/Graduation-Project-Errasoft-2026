@@ -1,50 +1,61 @@
 ﻿
+
 namespace AirlineReservationSystem.Repositories.Interfaces
 {
     public interface IGenericRepository<T>
-        where T : class
+        where T : AuditableEntity
     {
+        #region Read
 
-        // Read
         Task<IEnumerable<T>> GetAllAsync(
-           CancellationToken cancellationToken = default);
+            BaseQuery<T>? query = null,
+            CancellationToken cancellationToken = default);
 
-        Task<T?> GetByIdAsync(int id
-            , CancellationToken cancellationToken = default);
+        Task<T?> GetByIdAsync(
+            int id,
+            BaseQuery<T>? query = null,
+            CancellationToken cancellationToken = default);
 
         Task<T?> GetOneAsync(
-            Expression<Func<T, bool>> filter,
+            BaseQuery<T> query,
             CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<T>> GetWhereAsync(
-            Expression<Func<T, bool>> filter,
+        Task<int> CountAsync(
+            BaseQuery<T>? query = null,
             CancellationToken cancellationToken = default);
 
-       
         Task<bool> ExistsAsync(
             Expression<Func<T, bool>> filter,
             CancellationToken cancellationToken = default);
 
-        Task<int> CountAsync(
-            Expression<Func<T, bool>>? filter = null,
+        #endregion
+
+        #region Create
+
+        Task AddAsync(
+            T entity,
             CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<T>> GetPagedAsync(
-            int pageNumber,
-            int pageSize,
+        Task AddRangeAsync(
+            IEnumerable<T> entities,
             CancellationToken cancellationToken = default);
-        // Create
-        Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
-        Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        #endregion
 
-        // Update
+        #region Update
+
         void Update(T entity);
 
         void UpdateRange(IEnumerable<T> entities);
 
-        // Delete
+        #endregion
+
+        #region Delete
+
         void Delete(T entity);
+
         void DeleteRange(IEnumerable<T> entities);
+
+        #endregion
     }
 }

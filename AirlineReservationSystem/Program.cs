@@ -4,7 +4,7 @@ namespace AirlineReservationSystem
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,7 @@ namespace AirlineReservationSystem
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
+           
 
             // Identity
             builder.Services
@@ -33,10 +34,12 @@ namespace AirlineReservationSystem
                 .AddDefaultTokenProviders();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-            builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+            builder.Services.AddScoped<IAirportService, AirportService>();
+            builder.Services.AddScoped<IAircraftService, AircraftService>();
+            builder.Services.AddScoped<ISeatService, SeatService>();
             builder.Services.AddScoped<IFlightRepository, FlightRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-            
+
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();            
 
             var app = builder.Build();
@@ -59,7 +62,13 @@ namespace AirlineReservationSystem
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
-
+            //DbInitializer
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                await DbInitializer.SeedAsync(context);
+            }
             app.Run();
         }
     }

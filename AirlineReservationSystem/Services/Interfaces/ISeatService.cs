@@ -1,27 +1,26 @@
-﻿
-using AirlineReservationSystem.ViewModels.AirportVM;
+﻿using AirlineReservationSystem.ViewModels.Seat;
 
 namespace AirlineReservationSystem.Services.Interfaces
 {
-    public interface IAirportService
+    public interface ISeatService
     {
-        Task<AirportIndexVM> GetAllAsync(AirportIndexVM vm,
+        Task<IEnumerable<SeatIndexVM>> GetAllAsync(
             CancellationToken cancellationToken = default);
 
-        Task<AirportDetailsVM?> GetByIdAsync(
+        Task<SeatDetailsVM?> GetByIdAsync(
             int id,
             CancellationToken cancellationToken = default);
 
-        Task<AirportUpdateVM?> GetForEditAsync(
+        Task<SeatUpdateVM?> GetForEditAsync(
             int id,
             CancellationToken cancellationToken = default);
 
         Task CreateAsync(
-            AirportCreateVM vm,
+            SeatCreateVM vm,
             CancellationToken cancellationToken = default);
 
         Task<bool> UpdateAsync(
-            AirportUpdateVM vm,
+            SeatUpdateVM vm,
             CancellationToken cancellationToken = default);
 
         Task<bool> DeleteAsync(

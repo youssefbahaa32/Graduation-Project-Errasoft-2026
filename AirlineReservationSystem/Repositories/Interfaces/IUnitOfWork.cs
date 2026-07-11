@@ -1,13 +1,14 @@
-﻿namespace AirlineReservationSystem.Repositories.Interfaces
+﻿public interface IUnitOfWork : IDisposable
 {
-    public interface IUnitOfWork : IDisposable
-    {
-        IAirportRepository Airports { get; }
+    IAirportRepository Airports { get; }
 
-        IFlightRepository Flights { get; }
+    IAircraftRepository Aircrafts { get; }
 
-        IBookingRepository Bookings { get; }
+    ISeatRepository Seats { get; }
 
-        Task<int> SaveChangesAsync();
-    }
+    IFlightRepository Flights { get; }
+
+    IBookingRepository Bookings { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -1,18 +1,18 @@
-﻿
-namespace AirlineReservationSystem.ViewModels.Aircraft
+﻿public class AircraftIndexVM : BaseIndexVM
 {
-    public class AircraftIndexVM
-    {
-        public int Id { get; set; }
+    public string? Manufacturer { get; set; }
 
-        public string Model { get; set; } = null!;
+    public string? Model { get; set; }
 
-        public string Manufacturer { get; set; } = null!;
+    public string? RegistrationNumber { get; set; }
 
-        public string RegistrationNumber { get; set; } = null!;
+    public AircraftStatus? Status { get; set; }
 
-        public int Capacity { get; set; }
+    public int? MinCapacity { get; set; }
 
-        public AircraftStatus Status { get; set; }
-    }
+    public int? MaxCapacity { get; set; }
+
+    public AircraftSortBy SortBy { get; set; }
+
+    public List<AircraftListVM> Aircrafts { get; set; } = [];
 }
