@@ -1,4 +1,7 @@
 using AirlineReservationSystem.Data;
+using AirlineReservationSystem.Services.Implementations;
+
+
 
 namespace AirlineReservationSystem
 {
@@ -9,7 +12,7 @@ namespace AirlineReservationSystem
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            
+
             builder.Services.AddControllersWithViews();
 
             // DbContext
@@ -28,16 +31,32 @@ namespace AirlineReservationSystem
                     options.Password.RequiredLength = 8;
 
                     options.User.RequireUniqueEmail = true;
+
+                    options.SignIn.RequireConfirmedEmail = true;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                      options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+
+                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                });
+
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             builder.Services.AddScoped<IAirportRepository, AirportRepository>();
             builder.Services.AddScoped<IFlightRepository, FlightRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-            
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();            
+
+            builder.Services.AddScoped<IGenericRepository<ApplicationUserOTP>, GenericRepository<ApplicationUserOTP>>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 
@@ -57,7 +76,7 @@ namespace AirlineReservationSystem
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{area=Identity}/{controller=Account}/{action=Register}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

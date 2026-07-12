@@ -15,10 +15,14 @@ global using AirlineReservationSystem.Repositories.Implementations;
 global using AirlineReservationSystem.Repositories.Interfaces;
 //global using AirlineReservationSystem.Repositories.IRepository;
 //global using AirlineReservationSystem.Services;
-//global using AirlineReservationSystem.Services.IServices;
+global using AirlineReservationSystem.Services.IServices;
 global using Microsoft.AspNetCore.Identity.UI.Services;
 global using Azure.Core;
 global using System.Net.Sockets;
+
+global using AirlineReservationSystem.Utility;
+global using AirlineReservationSystem.ViewModels;
+
 // ASP.NET Core MVC
 global using Microsoft.AspNetCore.Mvc;
 // Entity Framework Core

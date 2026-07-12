@@ -1,0 +1,386 @@
+﻿@model ValidateOTPVM
+@{
+    ViewData["Title"] = "ValidateOTP";
+}
+
+@section Styles {
+<style>
+    :root {
+        --sky-blue: #0d6efd;
+        --sky-blue-dark: #0a58ca;
+        --sky-navy: #0b2447;
+    }
+
+    .otp-page {
+        min-height: 100vh;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: linear-gradient(180deg, #0b2447 0%, #164a7a 35%, #3d7cb8 65%, #bcd9ef 100%);
+        padding: 40px 15px;
+    }
+
+    .otp-cloud {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.55);
+        border-radius: 50%;
+        filter: blur(1px);
+        opacity: 0.7;
+    }
+
+        .otp-cloud::before, .otp-cloud::after {
+            content: "";
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+    .cloud1 {
+        width: 140px;
+        height: 45px;
+        top: 10%;
+        left: 8%;
+        animation: floatX 30s linear infinite;
+    }
+
+        .cloud1::before {
+            width: 70px;
+            height: 70px;
+            top: -35px;
+            left: 15px;
+        }
+
+        .cloud1::after {
+            width: 55px;
+            height: 55px;
+            top: -25px;
+            left: 70px;
+        }
+
+    .cloud2 {
+        width: 100px;
+        height: 35px;
+        top: 20%;
+        right: 10%;
+        animation: floatX 40s linear infinite reverse;
+    }
+
+        .cloud2::before {
+            width: 55px;
+            height: 55px;
+            top: -28px;
+            left: 10px;
+        }
+
+        .cloud2::after {
+            width: 40px;
+            height: 40px;
+            top: -18px;
+            left: 55px;
+        }
+
+    .cloud3 {
+        width: 150px;
+        height: 48px;
+        top: 70%;
+        left: 5%;
+        opacity: 0.32;
+        animation: floatX 48s linear infinite;
+    }
+
+        .cloud3::before {
+            width: 78px;
+            height: 78px;
+            top: -38px;
+            left: 18px;
+        }
+
+        .cloud3::after {
+            width: 58px;
+            height: 58px;
+            top: -26px;
+            left: 82px;
+        }
+
+    @@keyframes floatX {
+        0% {
+            transform: translateX(0);
+        }
+
+        50% {
+            transform: translateX(40px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    .otp-dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px);
+        background-size: 26px 26px;
+        opacity: 0.5;
+    }
+
+    .otp-plane {
+        position: absolute;
+        top: 40%;
+        left: -10%;
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        animation: flyAcross 20s linear infinite;
+        z-index: 1;
+    }
+
+    @@keyframes flyAcross {
+        0% {
+            left: -10%;
+            top: 45%;
+            transform: rotate(8deg);
+        }
+
+        50% {
+            left: 55%;
+            top: 12%;
+            transform: rotate(8deg);
+        }
+
+        100% {
+            left: 115%;
+            top: 4%;
+            transform: rotate(8deg);
+        }
+    }
+
+    /* Boarding pass style card */
+    .otp-card {
+        position: relative;
+        z-index: 2;
+        max-width: 520px;
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 22px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .otp-header {
+        background: linear-gradient(120deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+        color: #fff;
+        text-align: center;
+        padding: 38px 30px 32px;
+        position: relative;
+    }
+
+    .otp-header-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+        font-size: 1.8rem;
+    }
+
+    .otp-header h2 {
+        font-weight: 700;
+        margin-bottom: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .otp-header small {
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .otp-ticket-strip {
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 14px;
+        background-image: radial-gradient(circle at 10px 0, transparent 8px, var(--sky-blue-dark) 8px);
+        background-size: 20px 16px;
+        background-position: 0 -8px;
+    }
+
+    .otp-body {
+        padding: 45px 45px 30px;
+    }
+
+    .otp-lead {
+        text-align: center;
+        color: #5b6b7c;
+        font-size: 1.02rem;
+        margin-bottom: 34px;
+    }
+
+    .otp-label {
+        font-weight: 600;
+        color: #0b2447;
+        margin-bottom: 10px;
+        font-size: 0.98rem;
+        display: block;
+        text-align: center;
+    }
+
+    .otp-input-wrapper {
+        margin-bottom: 12px;
+    }
+
+        .otp-input-wrapper input.form-control {
+            border-radius: 12px;
+            border: 1.5px solid #dfe6ec;
+            background: #f8fafc;
+            padding: 16px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+
+            .otp-input-wrapper input.form-control:focus {
+                border-color: var(--sky-blue);
+                box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+                background: #fff;
+            }
+
+    .otp-timer {
+        text-align: center;
+        color: #9aa7b5;
+        font-size: 0.92rem;
+        margin-bottom: 26px;
+    }
+
+        .otp-timer i {
+            color: var(--sky-blue);
+            margin-inline-end: 4px;
+        }
+
+    .otp-submit-btn {
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.3px;
+        background: linear-gradient(120deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+        box-shadow: 0 10px 22px rgba(13, 110, 253, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .otp-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 110, 253, 0.4);
+        }
+
+    .otp-back-link {
+        color: var(--sky-blue-dark) !important;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+        .otp-back-link:hover {
+            color: var(--sky-blue) !important;
+        }
+
+    .otp-footer {
+        text-align: center;
+        padding: 18px;
+        background: #f4f7fa;
+        border-top: 1px dashed #dbe3ea;
+        color: #7c8a97;
+        font-size: 0.88rem;
+    }
+
+        .otp-footer i {
+            color: var(--sky-blue);
+            margin-inline-end: 5px;
+        }
+
+    @@media (max-width: 576px) {
+        .otp-body {
+            padding: 34px 24px 20px;
+        }
+
+        .otp-header {
+            padding: 30px 20px 26px;
+        }
+    }
+</style>
+}
+
+<div class="otp-page">
+    <div class="otp-dots"></div>
+    <div class="otp-cloud cloud1"></div>
+    <div class="otp-cloud cloud2"></div>
+    <div class="otp-cloud cloud3"></div>
+    <i class="fa-solid fa-plane otp-plane"></i>
+
+    <div class="otp-card">
+        <!-- Header -->
+        <div class="otp-header">
+            <div class="otp-header-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2>Verify Code</h2>
+            <small>Enter the OTP sent to you</small>
+            <div class="otp-ticket-strip"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="otp-body">
+            <p class="otp-lead">
+                Please enter the verification code to continue
+            </p>
+
+            <form asp-action="ValidateOTP">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="otp-input-wrapper">
+                    <label asp-for="OTP" class="otp-label"></label>
+                    <input asp-for="OTP"
+                           class="form-control form-control-lg text-center"
+                           placeholder="• • • • • •"
+                           style="letter-spacing: 10px; font-size: 1.6rem;" />
+                    <span asp-validation-for="OTP" class="text-danger d-block text-center mt-2"></span>
+                </div>
+
+                <div class="otp-timer">
+                    <i class="fa-regular fa-clock"></i> Code expires shortly, please enter it promptly
+                </div>
+
+                <div class="d-grid mb-4">
+                    <input type="submit"
+                           value="Verify Code"
+                           class="btn btn-primary btn-lg otp-submit-btn text-white" />
+                </div>
+
+                <div class="text-center">
+                    <a asp-action="Index" class="text-decoration-none otp-back-link">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="otp-footer">
+            <i class="fa-solid fa-lock"></i>Secure verification process
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <partial name="_NotificationPartial">
+    }

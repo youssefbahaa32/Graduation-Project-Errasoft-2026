@@ -28,6 +28,7 @@ namespace AirlineReservationSystem.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<LoyaltyAccount> LoyaltyAccounts { get; set; }
         public DbSet<PointTransaction> PointTransactions { get; set; }
+        public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
