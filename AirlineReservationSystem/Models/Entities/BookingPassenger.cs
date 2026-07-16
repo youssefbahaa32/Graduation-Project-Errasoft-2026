@@ -1,7 +1,7 @@
 ﻿
 namespace AirlineReservationSystem.Models.Entities;
 
-public class BookingPassenger : AuditableEntity //راكبًا داخل حجز معين مع المقعد المخصص له والتذكره الخاصه به
+public class BookingPassenger : AuditableEntity //راكبًا داخل حجز معين مع المقعد المخصص له والتذكره الخاصه به بالاضافه للحقائب معلومات
 {
     public int BookingId { get; set; }
 
@@ -13,7 +13,10 @@ public class BookingPassenger : AuditableEntity //راكبًا داخل حجز �
 
     public Passenger Passenger { get; set; } = null!;
 
-    public FlightSeat FlightSeat { get; set; } = null!; 
+    public FlightSeat FlightSeat { get; set; } = null!;
 
-    public Ticket? Ticket { get; set; }//لأن التذكرة تخص راكبًا معينًا داخل حجز معين وعلى مقعد معين.
+    public Ticket? Ticket { get; set; }
+
+    public ICollection<Baggage> Baggages { get; set; }
+        = new HashSet<Baggage>();
 }

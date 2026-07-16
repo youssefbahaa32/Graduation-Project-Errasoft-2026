@@ -19,12 +19,12 @@ public class UnitOfWork : IUnitOfWork
         Bookings = new BookingRepository(context);
     }
 
-    public async Task<int> CompleteAsync()
+    public async Task<int> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync();
     }
 
-    public void Dispose()
+    public void Dispose()//هذا الميثود يقوم بتحرير الموارد المستخدمة من قبل الكائن UnitOfWork عند الانتهاء من استخدامه.
     {
         _context.Dispose();
     }

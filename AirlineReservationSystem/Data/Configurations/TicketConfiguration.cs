@@ -20,7 +20,5 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.HasOne(t => t.BookingPassenger)
                .WithOne(b => b.Ticket)
                .HasForeignKey<Ticket>(t => t.BookingPassengerId);
-
-
     }
 }

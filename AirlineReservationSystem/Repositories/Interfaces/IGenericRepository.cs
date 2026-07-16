@@ -1,25 +1,50 @@
-﻿namespace AirlineReservationSystem.Repositories.Interfaces
+﻿
+namespace AirlineReservationSystem.Repositories.Interfaces
 {
     public interface IGenericRepository<T>
-     where T : class
+        where T : class
     {
 
-        Task AddAsync(T entity);
+        // Read
+        Task<IEnumerable<T>> GetAllAsync(
+           CancellationToken cancellationToken = default);
 
-        void Update(T entity);
-
-        void Delete(T entity);
-
-        Task SaveAsync();
-
-       Task<IEnumerable<T>> GetAllAsync(
-            Expression<Func<T, bool>>? expression = null,
-            Expression<Func<T, object>>?[]? includes = null,
-            bool tracked = true);
+        Task<T?> GetByIdAsync(int id
+            , CancellationToken cancellationToken = default);
 
         Task<T?> GetOneAsync(
-            Expression<Func<T, bool>>? expression = null,
-            Expression<Func<T, object>>?[]? includes = null,
-            bool tracked = true);
+            Expression<Func<T, bool>> filter,
+            CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<T>> GetWhereAsync(
+            Expression<Func<T, bool>> filter,
+            CancellationToken cancellationToken = default);
+
+       
+        Task<bool> ExistsAsync(
+            Expression<Func<T, bool>> filter,
+            CancellationToken cancellationToken = default);
+
+        Task<int> CountAsync(
+            Expression<Func<T, bool>>? filter = null,
+            CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<T>> GetPagedAsync(
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default);
+        // Create
+        Task AddAsync(T entity, CancellationToken cancellationToken = default);
+
+        Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+
+        // Update
+        void Update(T entity);
+
+        void UpdateRange(IEnumerable<T> entities);
+
+        // Delete
+        void Delete(T entity);
+        void DeleteRange(IEnumerable<T> entities);
     }
 }

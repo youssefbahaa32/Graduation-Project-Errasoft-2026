@@ -7,7 +7,7 @@ public class BookingPassengerConfiguration
 {
     public void Configure(EntityTypeBuilder<BookingPassenger> builder)
     {
-        builder.ToTable("BookingPassengers");
+        builder.ToTable("BookingPassenger");
 
         builder.HasKey(bp => bp.Id);
 

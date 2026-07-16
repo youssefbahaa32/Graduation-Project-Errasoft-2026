@@ -18,10 +18,8 @@ public class Passenger : AuditableEntity
     public DateTime PassportExpiryDate { get; set; }
 
     // Navigation
-
     public ICollection<BookingPassenger> BookingPassengers { get; set; }
         = new HashSet<BookingPassenger>();
 
-    public ICollection<Baggage> Baggages { get; set; }
-        = new HashSet<Baggage>();
+   
 }
