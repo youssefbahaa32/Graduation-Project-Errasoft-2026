@@ -6,6 +6,8 @@
 
         public string LastName { get; set; } = null!;
 
+        public string FullName => $"{FirstName} {LastName}";
+
         public DateTime DateOfBirth { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

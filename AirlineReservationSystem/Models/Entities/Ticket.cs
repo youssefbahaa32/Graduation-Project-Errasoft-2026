@@ -4,7 +4,7 @@ namespace AirlineReservationSystem.Models.Entities;
 
 public class Ticket : AuditableEntity
 {
-	public DateTime IssuedAt { get; set; }// تاريخ إصدار التذكرة
+	public DateTime IssuedAt { get; set; } = DateTime.UtcNow;// تاريخ إصدار التذكرة
 
 	public decimal Fare { get; set; } // السعر الذي دفعه المسافر مقابل التذكرة
 

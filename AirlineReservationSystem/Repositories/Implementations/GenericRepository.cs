@@ -14,24 +14,70 @@ namespace AirlineReservationSystem.Repositories.Implementations
             _context = context;
             _dbSet = context.Set<T>();
         }
-        //Read
-        public async Task<IEnumerable<T>> GetAllAsync(
-            CancellationToken cancellationToken = default)
-            => await _dbSet.ToListAsync(cancellationToken);
 
-        public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-           => await _dbSet
-            .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        public async Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>[]? includes = null,
+            bool tracked = true,
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (expression is not null)
+                query = query.Where(expression);
+
+            if (includes is not null)
+            {
+                foreach (var include in includes)
+                {
+                    if (include is not null)
+                        query = query.Include(include);
+                }
+            }
+
+            if (!tracked)
+                query = query.AsNoTracking();
+
+            return await query.ToListAsync(cancellationToken);
+        }
 
         public async Task<T?> GetOneAsync(
-            Expression<Func<T, bool>> filter,
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>[]? includes = null,
+            bool tracked = true,
             CancellationToken cancellationToken = default)
-            => await _dbSet.FirstOrDefaultAsync(filter, cancellationToken);
+        {
+            IQueryable<T> query = _dbSet;
 
-        public async Task<IEnumerable<T>> GetWhereAsync(
-            Expression<Func<T, bool>> filter,
+            if (expression is not null)
+                query = query.Where(expression);
+
+            if (includes is not null)
+            {
+                foreach (var include in includes)
+                {
+                    if (include is not null)
+                        query = query.Include(include);
+                }
+            }
+
+            if (!tracked)
+                query = query.AsNoTracking();
+
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+           => await _dbSet.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id, cancellationToken);
+
+        public async Task<IEnumerable<T>> GetPagedAsync(
+            int pageNumber,
+            int pageSize,
             CancellationToken cancellationToken = default)
-            => await _dbSet.Where(filter).ToListAsync(cancellationToken);
+            => await _dbSet
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
 
         public async Task<bool> ExistsAsync(
             Expression<Func<T, bool>> filter,
@@ -44,59 +90,23 @@ namespace AirlineReservationSystem.Repositories.Implementations
             => filter == null
                 ? await _dbSet.CountAsync(cancellationToken)
                 : await _dbSet.CountAsync(filter, cancellationToken);
-        public async Task<IEnumerable<T>> GetPagedAsync(
-            int pageNumber,
-            int pageSize,
-            CancellationToken cancellationToken = default)
-            => await _dbSet
-                .Skip(( pageNumber - 1 ) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
 
-
-        // Create
         public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
             => await _dbSet.AddAsync(entity, cancellationToken);
 
         public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
             => await _dbSet.AddRangeAsync(entities, cancellationToken);
 
-        // Update
         public void Update(T entity)
             => _dbSet.Update(entity);
+
         public void UpdateRange(IEnumerable<T> entities)
             => _dbSet.UpdateRange(entities);
 
-        // Delete
         public void Delete(T entity)
             => _dbSet.Remove(entity);
+
         public void DeleteRange(IEnumerable<T> entities)
             => _dbSet.RemoveRange(entities);
-
-        // BuildQuery method to construct the query with optional parameters
-        protected virtual IQueryable<T> BuildQuery(
-            bool asNoTracking = false,
-            bool ignoreQueryFilters = false,
-            Func<IQueryable<T>, IQueryable<T>>? include = null,
-            Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null
-            )
-        {
-            IQueryable<T> query = _dbSet;
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            if (filter != null)
-                query = query.Where(filter);
-
-            if (orderBy != null)
-                query = orderBy(query);
-
-            if (include != null)
-                query = include(query);
-
-            return query;
-        }
     }
 }

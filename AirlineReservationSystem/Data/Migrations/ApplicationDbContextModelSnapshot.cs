@@ -4,19 +4,16 @@ using AirlineReservationSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AirlineReservationSystem.Migrations
+namespace AirlineReservationSystem.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260708222239_UpdateRelationships")]
-    partial class UpdateRelationships
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,21 +50,23 @@ namespace AirlineReservationSystem.Migrations
 
                     b.Property<string>("Manufacturer")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Model")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -80,7 +79,7 @@ namespace AirlineReservationSystem.Migrations
                     b.HasIndex("RegistrationNumber")
                         .IsUnique();
 
-                    b.ToTable("Aircrafts", (string)null);
+                    b.ToTable("Aircrafts");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Airport", b =>
@@ -131,6 +130,9 @@ namespace AirlineReservationSystem.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -156,6 +158,14 @@ namespace AirlineReservationSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BagTagNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("BookingPassengerId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -168,17 +178,19 @@ namespace AirlineReservationSystem.Migrations
                     b.Property<DateTime?>("DeletedBy")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("FlightId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int>("PassengerId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -191,7 +203,9 @@ namespace AirlineReservationSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PassengerId");
+                    b.HasIndex("BookingPassengerId");
+
+                    b.HasIndex("FlightId");
 
                     b.ToTable("Baggages", (string)null);
                 });
@@ -302,7 +316,7 @@ namespace AirlineReservationSystem.Migrations
                     b.HasIndex("BookingId", "PassengerId")
                         .IsUnique();
 
-                    b.ToTable("BookingPassengers", (string)null);
+                    b.ToTable("BookingPassenger", (string)null);
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Flight", b =>
@@ -491,7 +505,9 @@ namespace AirlineReservationSystem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -638,7 +654,8 @@ namespace AirlineReservationSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookingId");
+                    b.HasIndex("BookingId")
+                        .IsUnique();
 
                     b.HasIndex("TransactionReference")
                         .IsUnique();
@@ -719,8 +736,10 @@ namespace AirlineReservationSystem.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SeatClass")
-                        .HasColumnType("int");
+                    b.Property<string>("SeatClass")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("SeatNumber")
                         .IsRequired()
@@ -749,6 +768,9 @@ namespace AirlineReservationSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("BookingPassengerId")
                         .HasColumnType("int");
 
@@ -764,8 +786,14 @@ namespace AirlineReservationSystem.Migrations
                     b.Property<DateTime?>("DeletedBy")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("Fare")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -834,6 +862,9 @@ namespace AirlineReservationSystem.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("LoyaltyAccountId")
+                        .HasColumnType("int");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -863,6 +894,8 @@ namespace AirlineReservationSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LoyaltyAccountId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -872,6 +905,38 @@ namespace AirlineReservationSystem.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AirlineReservationSystem.Models.Identity.ApplicationUserOTP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpireIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("ApplicationUserOTPs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1009,13 +1074,21 @@ namespace AirlineReservationSystem.Migrations
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Baggage", b =>
                 {
-                    b.HasOne("AirlineReservationSystem.Models.Entities.Passenger", "Passenger")
+                    b.HasOne("AirlineReservationSystem.Models.Entities.BookingPassenger", "BookingPassenger")
                         .WithMany("Baggages")
-                        .HasForeignKey("PassengerId")
+                        .HasForeignKey("BookingPassengerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Passenger");
+                    b.HasOne("AirlineReservationSystem.Models.Entities.Flight", "Flight")
+                        .WithMany()
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BookingPassenger");
+
+                    b.Navigation("Flight");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Booking", b =>
@@ -1046,7 +1119,7 @@ namespace AirlineReservationSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("AirlineReservationSystem.Models.Entities.FlightSeat", "FlightSeat")
-                        .WithMany()
+                        .WithMany("BookingPassenger")
                         .HasForeignKey("FlightSeatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1124,7 +1197,7 @@ namespace AirlineReservationSystem.Migrations
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Notification", b =>
                 {
                     b.HasOne("AirlineReservationSystem.Models.Identity.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1135,8 +1208,8 @@ namespace AirlineReservationSystem.Migrations
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Payment", b =>
                 {
                     b.HasOne("AirlineReservationSystem.Models.Entities.Booking", "Booking")
-                        .WithMany("Payments")
-                        .HasForeignKey("BookingId")
+                        .WithOne("Payment")
+                        .HasForeignKey("AirlineReservationSystem.Models.Entities.Payment", "BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1174,6 +1247,26 @@ namespace AirlineReservationSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("BookingPassenger");
+                });
+
+            modelBuilder.Entity("AirlineReservationSystem.Models.Identity.ApplicationUser", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Entities.LoyaltyAccount", "LoyaltyAccount")
+                        .WithMany()
+                        .HasForeignKey("LoyaltyAccountId");
+
+                    b.Navigation("LoyaltyAccount");
+                });
+
+            modelBuilder.Entity("AirlineReservationSystem.Models.Identity.ApplicationUserOTP", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1245,11 +1338,13 @@ namespace AirlineReservationSystem.Migrations
                 {
                     b.Navigation("BookingPassengers");
 
-                    b.Navigation("Payments");
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.BookingPassenger", b =>
                 {
+                    b.Navigation("Baggages");
+
                     b.Navigation("Ticket");
                 });
 
@@ -1260,6 +1355,11 @@ namespace AirlineReservationSystem.Migrations
                     b.Navigation("FlightSeats");
                 });
 
+            modelBuilder.Entity("AirlineReservationSystem.Models.Entities.FlightSeat", b =>
+                {
+                    b.Navigation("BookingPassenger");
+                });
+
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.LoyaltyAccount", b =>
                 {
                     b.Navigation("PointTransactions");
@@ -1267,8 +1367,6 @@ namespace AirlineReservationSystem.Migrations
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Passenger", b =>
                 {
-                    b.Navigation("Baggages");
-
                     b.Navigation("BookingPassengers");
                 });
 
@@ -1280,6 +1378,8 @@ namespace AirlineReservationSystem.Migrations
             modelBuilder.Entity("AirlineReservationSystem.Models.Identity.ApplicationUser", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

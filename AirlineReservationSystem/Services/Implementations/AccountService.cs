@@ -6,13 +6,14 @@ namespace AirlineReservationSystem.Services.Implementations
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGenericRepository<ApplicationUserOTP> _applicationUserOTPRepository;
         private readonly IEmailSender _emailSender;
-
+        private readonly IUnitOfWork _unitOfWork;
         public AccountService(UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender,
+            IEmailSender emailSender, IUnitOfWork unitOfWork,
             IGenericRepository<ApplicationUserOTP> applicationUserOTPRepository )
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _unitOfWork = unitOfWork;
             _applicationUserOTPRepository = applicationUserOTPRepository;
         }
 
@@ -31,7 +32,7 @@ namespace AirlineReservationSystem.Services.Implementations
                     OTP = otp.ToString(),
                     ApplicationUserId = user.Id
                 });
-                await _applicationUserOTPRepository.SaveAsync();
+                await _unitOfWork.SaveChangesAsync();
 
                 return true;
             }

@@ -1,5 +1,6 @@
 using AirlineReservationSystem.Data;
 using AirlineReservationSystem.Services.Implementations;
+using AirlineReservationSystem.Services.Interfaces;
 
 
 
@@ -53,6 +54,8 @@ namespace AirlineReservationSystem
 
             builder.Services.AddScoped<IGenericRepository<ApplicationUserOTP>, GenericRepository<ApplicationUserOTP>>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+
             builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 
@@ -72,12 +75,16 @@ namespace AirlineReservationSystem
             app.UseRouting();
 
             app.UseAuthorization();
+;
 
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{area=Identity}/{controller=Account}/{action=Register}/{id?}")
+                pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+
+
 
             app.Run();
         }

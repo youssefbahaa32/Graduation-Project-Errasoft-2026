@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AirlineReservationSystem.Migrations
+namespace AirlineReservationSystem.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -227,6 +227,23 @@ namespace AirlineReservationSystem.Migrations
                         principalTable: "Seats",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserOTPs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OTP = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpireIn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserOTPs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -565,8 +582,8 @@ namespace AirlineReservationSystem.Migrations
                     Fare = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TicketNumber = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    BookingPassengerId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    BookingPassengerId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -603,6 +620,11 @@ namespace AirlineReservationSystem.Migrations
                 table: "Airports",
                 column: "ICAOCode",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserOTPs_ApplicationUserId",
+                table: "ApplicationUserOTPs",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -773,6 +795,14 @@ namespace AirlineReservationSystem.Migrations
                 unique: true);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_ApplicationUserOTPs_AspNetUsers_ApplicationUserId",
+                table: "ApplicationUserOTPs",
+                column: "ApplicationUserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                 table: "AspNetUserClaims",
                 column: "UserId",
@@ -810,6 +840,9 @@ namespace AirlineReservationSystem.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_LoyaltyAccounts_AspNetUsers_UserId",
                 table: "LoyaltyAccounts");
+
+            migrationBuilder.DropTable(
+                name: "ApplicationUserOTPs");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");

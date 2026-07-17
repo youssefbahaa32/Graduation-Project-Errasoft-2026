@@ -4,9 +4,10 @@ namespace AirlineReservationSystem.Models.Entities;
 
 public class Booking : AuditableEntity
 {
-	public string BookingReference { get; set; } = null!;
+	public string BookingReference { get; set; } = $"BK-{DateTime.Now.Year}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
 
-	public string UserId { get; set; } = null!;
+
+    public string UserId { get; set; } = null!;
 
 	public int FlightId { get; set; }
 

@@ -28,7 +28,7 @@ public class BaggageConfiguration : IEntityTypeConfiguration<Baggage>
         // الحقيبة تابعة لمسافر واحد (Many Baggages to One Passenger)
         // إذا حُذف المسافر، تُحذف حقائبه تلقائياً (Cascade Delete)
         builder.HasOne(b => b.BookingPassenger)
-            .WithMany(p => p.Baggages)
+            .WithMany(bp => bp.Baggages)
             .HasForeignKey(b => b.BookingPassengerId)
             .OnDelete(DeleteBehavior.Cascade);
 
