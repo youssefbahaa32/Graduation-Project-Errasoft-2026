@@ -24,6 +24,7 @@ global using AirlineReservationSystem.ViewModels.Seat;
 global using AirlineReservationSystem.ViewModels.Flight;
 global using AirlineReservationSystem.ViewModels.BookingVM;
 global using AirlineReservationSystem.ViewModels.PassengerVM;
+global using AirlineReservationSystem.ViewModels.PaymentVM;
 global using AutoMapper;
 global using AirlineReservationSystem.Services.IServices;
 global using Microsoft.AspNetCore.Identity.UI.Services;
