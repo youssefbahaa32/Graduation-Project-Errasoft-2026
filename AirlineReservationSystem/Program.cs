@@ -1,4 +1,5 @@
 using AirlineReservationSystem.Data;
+using AirlineReservationSystem.Mappings;
 
 namespace AirlineReservationSystem
 {
@@ -33,20 +34,21 @@ namespace AirlineReservationSystem
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
+            builder.Services.AddAutoMapper(cfg =>
+                {}, typeof(MappingProfile).Assembly); builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+            builder.Services.AddScoped<IAircraftRepository, AircraftRepository>();
+            builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+            builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAirportService, AirportService>();
             builder.Services.AddScoped<IAircraftService, AircraftService>();
             builder.Services.AddScoped<ISeatService, SeatService>();
-            builder.Services.AddScoped<IFlightRepository, FlightRepository>();
-            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();            
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
-            {
+            {   
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -60,7 +62,7 @@ namespace AirlineReservationSystem
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{Area=Admin}/{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
             //DbInitializer
             using (var scope = app.Services.CreateScope())
