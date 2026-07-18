@@ -1,6 +1,7 @@
 ﻿namespace AirlineReservationSystem.Repositories.Interfaces
 {
-    public interface IAirportRepository
+    public interface IAirportRepository : IGenericRepository<Airport>
     {
+
     }
 }

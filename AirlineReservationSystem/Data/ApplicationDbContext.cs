@@ -34,6 +34,21 @@ namespace AirlineReservationSystem.Data
             base.OnModelCreating(builder);
 
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            // Set default values for CreatedAt and IsDeleted properties 
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                if (typeof(AuditableEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    builder.Entity(entityType.ClrType)
+                        .Property(nameof(AuditableEntity.CreatedAt))
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    builder.Entity(entityType.ClrType)
+                        .Property(nameof(AuditableEntity.IsDeleted))
+                        .HasDefaultValue(false);
+                }
+            }
         }
     }
 }

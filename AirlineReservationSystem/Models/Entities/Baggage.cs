@@ -4,7 +4,7 @@ namespace AirlineReservationSystem.Models.Entities;
 
 public class Baggage : AuditableEntity
 {
-    public int PassengerId { get; set; }
+    public string BagTagNumber { get; set; } = null!; // رقم الباركود الفريد للملصق
 
     public BaggageType Type { get; set; }
 
@@ -12,5 +12,11 @@ public class Baggage : AuditableEntity
 
     public decimal Price { get; set; }
 
-    public Passenger Passenger { get; set; } = null!;
+    // علاقة الحقيبة بالمسافر (كل حقيبة تخص مسافر واحد)
+    public int BookingPassengerId { get; set; }
+    public BookingPassenger BookingPassenger { get; set; } = null!;
+
+    // علاقة الحقيبة بالرحلة (الحقيبة تشحن على رحلة معينة)
+    public int FlightId { get; set; }
+    public Flight Flight { get; set; } = null!;
 }

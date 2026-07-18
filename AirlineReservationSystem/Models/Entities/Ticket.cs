@@ -4,15 +4,16 @@ namespace AirlineReservationSystem.Models.Entities;
 
 public class Ticket : AuditableEntity
 {
-    public string TicketNumber { get; set; } = null!;
+	public DateTime IssuedAt { get; set; }// تاريخ إصدار التذكرة
 
-    public int BookingId { get; set; }
+	public decimal Fare { get; set; } // السعر الذي دفعه المسافر مقابل التذكرة
 
-    public int PassengerId { get; set; }
-
+	public string? Barcode { get; set; }    // رمز شريطي فريد للتذكرة، يمكن استخدامه للتحقق من صحة التذكرة عند الصعود إلى الطائرة
+	public string TicketNumber { get; set; } = null!;
     public TicketStatus Status { get; set; }
 
-    public Booking Booking { get; set; } = null!;
+    public int BookingPassengerId { get; set; }
 
-    public Passenger Passenger { get; set; } = null!;
+    public BookingPassenger BookingPassenger { get; set; } = null!;
+
 }

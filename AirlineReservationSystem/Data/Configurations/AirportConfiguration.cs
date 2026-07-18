@@ -30,8 +30,20 @@ public class AirportConfiguration : IEntityTypeConfiguration<Airport>
                .IsRequired()
                .HasMaxLength(4);
 
+      
+
         builder.HasIndex(a => a.IATACode).IsUnique();
 
         builder.HasIndex(a => a.ICAOCode).IsUnique();
+
+        builder.HasMany(a => a.DepartureFlights)
+               .WithOne(f => f.DepartureAirport)
+               .HasForeignKey(f => f.DepartureAirportId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(a => a.ArrivalFlights)
+               .WithOne(f => f.ArrivalAirport)
+               .HasForeignKey(f => f.ArrivalAirportId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

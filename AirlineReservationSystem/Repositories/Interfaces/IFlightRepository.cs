@@ -1,6 +1,3 @@
-﻿namespace AirlineReservationSystem.Repositories.Interfaces
+﻿public interface IFlightRepository : IGenericRepository<Flight>
 {
-    public interface IFlightRepository
-    {
-    }
 }

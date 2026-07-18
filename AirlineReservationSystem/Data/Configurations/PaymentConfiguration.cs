@@ -20,7 +20,7 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
                .IsUnique();
 
         builder.HasOne(p => p.Booking)
-               .WithMany(b => b.Payments)
-               .HasForeignKey(p => p.BookingId);
+               .WithOne(b => b.Payment)
+               .HasForeignKey<Payment>( p => p.BookingId);
     }
 }

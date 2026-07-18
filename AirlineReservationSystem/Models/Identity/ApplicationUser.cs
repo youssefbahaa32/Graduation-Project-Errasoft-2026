@@ -14,5 +14,9 @@
 
         // Navigation Property
         public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
+        public LoyaltyAccount? LoyaltyAccount { get; set; }
+
+        public ICollection<Notification> Notifications { get; set; }
+            = new HashSet<Notification>();
     }
 }

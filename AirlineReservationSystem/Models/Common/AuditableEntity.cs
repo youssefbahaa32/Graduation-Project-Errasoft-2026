@@ -3,13 +3,13 @@
     public abstract class AuditableEntity : BaseEntity
     {
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? CreatedBy { get; set; }
+        public String? CreatedBy { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
-        public DateTime? UpdatedBy { get; set; }
+        public String? UpdatedBy { get; set; }
 
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public DateTime? DeletedBy { get; private set; }
+        public String? DeletedBy { get; private set; }
     }
 }
