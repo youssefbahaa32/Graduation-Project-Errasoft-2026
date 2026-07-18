@@ -53,6 +53,8 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 
             builder.Services.AddScoped<IGenericRepository<ApplicationUserOTP>, GenericRepository<ApplicationUserOTP>>();
+            builder.Services.AddScoped<IGenericRepository<Passenger>, GenericRepository<Passenger>>();
+            builder.Services.AddScoped<IPassengerService, PassengerService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
 

@@ -1,0 +1,140 @@
+﻿@model PassengerDetailsVm
+
+@{
+    ViewData["Title"] = "Passenger Details";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mt-2"><i class="fas fa-id-card me-2"></i>Passenger Details</h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Passengers</a></li>
+        <li class="breadcrumb-item active">Details</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-xl-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-1"></i> Personal Information
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">First Name</dt>
+                        <dd class="col-sm-8">@Model.FirstName</dd>
+
+                        <dt class="col-sm-4">Last Name</dt>
+                        <dd class="col-sm-8">@Model.LastName</dd>
+
+                        <dt class="col-sm-4">Date of Birth</dt>
+                        <dd class="col-sm-8">@Model.DateOfBirth.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4">Gender</dt>
+                        <dd class="col-sm-8">@Model.Gender</dd>
+
+                        <dt class="col-sm-4">Nationality</dt>
+                        <dd class="col-sm-8">@Model.Nationality</dd>
+
+                        <dt class="col-sm-4">Passport Number</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-light text-dark border">@Model.PassportNumber</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Passport Expiry</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.PassportExpiryDate < DateTime.UtcNow)
+                            {
+                                <span class="badge bg-danger">
+                                    Expired - @Model.PassportExpiryDate.ToString("dd MMM yyyy")
+                                </span>
+                            }
+                            else
+                            {
+                                <span>@Model.PassportExpiryDate.ToString("dd MMM yyyy")</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-ticket-alt me-1"></i> Booking History
+                </div>
+                <div class="card-body">
+                    @if (!Model.BookingReferences.Any())
+                    {
+                        <p class="text-muted mb-0">No bookings found for this passenger.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var reference in Model.BookingReferences)
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-plane-departure text-primary me-2"></i>
+                                    @reference
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+            <i class="fas fa-edit me-1"></i> Edit
+        </a>
+        <button type="button"
+                class="btn btn-danger btn-delete"
+                data-id="@Model.Id"
+                data-name="@Model.FirstName @Model.LastName"
+                title="Delete">
+            <i class="fas fa-trash me-1"></i> Delete
+        </button>
+    </div>
+
+</div>
+
+<!-- Delete confirmation form (hidden) -->
+<form id="deleteForm" asp-action="Delete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="deleteId" name="id" value="" />
+</form>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.btn-delete').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete passenger "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('deleteId').value = id;
+                        document.getElementById('deleteForm').submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

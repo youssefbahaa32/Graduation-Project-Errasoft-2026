@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.EntityFrameworkCore.Query;
+
 namespace AirlineReservationSystem.Repositories.Interfaces
 {
     public interface IGenericRepository<T>
@@ -16,6 +18,11 @@ namespace AirlineReservationSystem.Repositories.Interfaces
             bool tracked = true,
             CancellationToken cancellationToken = default);
 
+        Task<T?> GetOneWithIncludesAsync(Expression<Func<T, bool>>? expression = null,
+             Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
+            bool tracked = true,
+            CancellationToken cancellationToken = default);
+
         Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<T>> GetPagedAsync(
@@ -26,7 +33,7 @@ namespace AirlineReservationSystem.Repositories.Interfaces
         Task<bool> ExistsAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default);
         Task<int> CountAsync(Expression<Func<T, bool>>? filter = null, CancellationToken cancellationToken = default);
 
-       
+
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
         Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
         void Update(T entity);

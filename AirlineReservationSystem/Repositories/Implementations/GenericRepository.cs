@@ -1,5 +1,8 @@
 ﻿using AirlineReservationSystem.Data;
 using AirlineReservationSystem.Repositories.Interfaces;
+using AirlineReservationSystem.Services.Implementations;
+using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace AirlineReservationSystem.Repositories.Implementations
 {
@@ -43,7 +46,7 @@ namespace AirlineReservationSystem.Repositories.Implementations
 
         public async Task<T?> GetOneAsync(
             Expression<Func<T, bool>>? expression = null,
-            Expression<Func<T, object>>[]? includes = null,
+            Expression<Func<T, object>>?[]? includes = null,
             bool tracked = true,
             CancellationToken cancellationToken = default)
         {
@@ -60,6 +63,28 @@ namespace AirlineReservationSystem.Repositories.Implementations
                         query = query.Include(include);
                 }
             }
+
+            if (!tracked)
+                query = query.AsNoTracking();
+
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
+
+
+
+        public async Task<T?> GetOneWithIncludesAsync(
+            Expression<Func<T, bool>>? expression = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
+            bool tracked = true,
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (expression is not null)
+                query = query.Where(expression);
+
+            if (include is not null)
+                query = include(query);
 
             if (!tracked)
                 query = query.AsNoTracking();

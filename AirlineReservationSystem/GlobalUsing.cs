@@ -17,10 +17,13 @@ global using AirlineReservationSystem.Repositories.Interfaces;
 //global using AirlineReservationSystem.Services;
 //global using AirlineReservationSystem.Services.IServices;
 //VM
+global using AirlineReservationSystem.ViewModels;
 global using AirlineReservationSystem.ViewModels.Airport;
 global using AirlineReservationSystem.ViewModels.Aircraft;
 global using AirlineReservationSystem.ViewModels.Seat;
 global using AirlineReservationSystem.ViewModels.Flight;
+global using AirlineReservationSystem.ViewModels.BookingVM;
+global using AirlineReservationSystem.ViewModels.PassengerVM;
 global using AutoMapper;
 global using AirlineReservationSystem.Services.IServices;
 global using Microsoft.AspNetCore.Identity.UI.Services;

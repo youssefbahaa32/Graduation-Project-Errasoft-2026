@@ -1,0 +1,239 @@
+﻿@model PagedResultVm<PassengerListItemVm>
+
+@{
+    ViewData["Title"] = "Passengers";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mt-2">
+            <i class="fas fa-users me-2"></i>Passengers
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add New Passenger
+        </a>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Passengers</li>
+    </ol>
+
+    <!-- Search Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i> Search
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text"
+                               name="searchPassport"
+                               value="@Model.CurrentSearch"
+                               class="form-control"
+                               placeholder="Search by passport number..." />
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.CurrentSearch))
+                {
+                    <div class="col-auto">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i> Clear
+                        </a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Passengers List
+        </div>
+        <div class="card-body">
+            @if (!Model.Items.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted"></i>
+                    <p class="text-muted mt-3 mb-0">No passengers found.</p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover" id="passengersTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Passport Number</th>
+                            <th>Nationality</th>
+                            <th>Passport Expiry</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var passenger in Model.Items)
+                        {
+                            <tr>
+                                <td>@passenger.Id</td>
+                                <td class="fw-semibold">@passenger.FullName</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        @passenger.PassportNumber
+                                    </span>
+                                </td>
+                                <td>@passenger.Nationality</td>
+                                <td>
+                                    @if (passenger.PassportExpiryDate < DateTime.UtcNow)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Expired - @passenger.PassportExpiryDate.ToString("dd MMM yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@passenger.PassportExpiryDate.ToString("dd MMM yyyy")</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@passenger.Id"
+                                           class="btn btn-outline-info" title="Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@passenger.Id"
+                                           class="btn btn-outline-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-outline-danger btn-delete"
+                                                data-id="@passenger.Id"
+                                                data-name="@passenger.FullName"
+                                                title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Items.Any())
+        {
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <small class="text-muted">
+                    Showing page @Model.PageNumber of @Model.TotalPages
+                    (@Model.TotalCount total passenger@(Model.TotalCount == 1 ? "" : "s"))
+                </small>
+
+                <nav aria-label="Passengers pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-pageNumber="1"
+                               asp-route-searchPassport="@Model.CurrentSearch">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber - 1)"
+                               asp-route-searchPassport="@Model.CurrentSearch">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+
+                        @{
+                            int startPage = Math.Max(1, Model.PageNumber - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-pageNumber="@i"
+                                   asp-route-searchPassport="@Model.CurrentSearch">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber + 1)"
+                               asp-route-searchPassport="@Model.CurrentSearch">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-pageNumber="@Model.TotalPages"
+                               asp-route-searchPassport="@Model.CurrentSearch">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete confirmation form (hidden) -->
+<form id="deleteForm" asp-action="Delete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="deleteId" name="id" value="" />
+</form>
+
+@section Scripts {
+    <script>
+        // Toastr messages from TempData
+        @if (TempData["success-notification"] is not null)
+        {
+            <text>toastr.success('@TempData["success-notification"]');</text>
+        }
+        @if (TempData["error-notification"] is not null)
+        {
+            <text>toastr.error('@TempData["error-notification"]');</text>
+        }
+
+        // SweetAlert2 delete confirmation
+        document.querySelectorAll('.btn-delete').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete passenger "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('deleteId').value = id;
+                        document.getElementById('deleteForm').submit();
+                    }
+                });
+            });
+        });
+    </script>
+}
