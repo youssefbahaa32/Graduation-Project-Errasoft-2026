@@ -1,16 +1,15 @@
-﻿
-namespace AirlineReservationSystem.ViewModels.Seat
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+public class SeatIndexVM : BaseIndexVM
 {
-    public class SeatIndexVM
-    {
-        public int Id { get; set; }
+    public int? AircraftId { get; set; }
 
-        public string SeatNumber { get; set; } = null!;
+    public SeatClass? SeatClass { get; set; }
 
-        public SeatClass SeatClass { get; set; }
+    public SeatSortBy SortBy { get; set; }
 
-        public int AircraftId { get; set; }
+    public List<SeatListVM> Seats { get; set; } = [];
 
-        public string Aircraft { get; set; } = null!;
-    }
+    public IEnumerable<SelectListItem> Aircrafts { get; set; }
+        = Enumerable.Empty<SelectListItem>();
 }

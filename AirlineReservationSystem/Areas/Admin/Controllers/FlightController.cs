@@ -1,30 +1,48 @@
 ﻿using AirlineReservationSystem.Services.Interfaces;
-using AirlineReservationSystem.ViewModels.Seat;
+using AirlineReservationSystem.ViewModels.Flight;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirlineReservationSystem.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class SeatController : Controller
+    public class FlightController : Controller
     {
-        private readonly ISeatService _seatService;
+        private readonly IFlightService _flightService;
 
-        public SeatController(ISeatService seatService)
+        public FlightController(IFlightService flightService)
         {
-            _seatService = seatService;
+            _flightService = flightService;
         }
 
         #region Index
 
         public async Task<IActionResult> Index(
-            SeatIndexVM vm,
+            FlightIndexVM vm,
             CancellationToken cancellationToken)
         {
-            var seats = await _seatService.GetAllAsync(
+            vm = await _flightService.GetAllAsync(
                 vm,
                 cancellationToken);
 
-            return View(seats);
+            return View(vm);
+        }
+
+        #endregion
+
+        #region Details
+
+        public async Task<IActionResult> Details(
+            int id,
+            CancellationToken cancellationToken)
+        {
+            var flight = await _flightService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (flight == null)
+                return NotFound();
+
+            return View(flight);
         }
 
         #endregion
@@ -35,7 +53,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         public async Task<IActionResult> Create(
             CancellationToken cancellationToken)
         {
-            var vm = await _seatService.GetForCreateAsync(
+            var vm = await _flightService.GetForCreateAsync(
                 cancellationToken);
 
             return View(vm);
@@ -44,22 +62,22 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            SeatCreateVM model,
+            FlightCreateVM vm,
             CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
-                model = await _seatService.GetForCreateAsync(
+                vm = await _flightService.GetForCreateAsync(
                     cancellationToken);
 
-                return View(model);
+                return View(vm);
             }
 
-            await _seatService.CreateAsync(
-                model,
+            await _flightService.CreateAsync(
+                vm,
                 cancellationToken);
 
-            TempData["Success"] = "Seat created successfully.";
+            TempData["Success"] = "Flight created successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -73,43 +91,39 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             int id,
             CancellationToken cancellationToken)
         {
-            var seat = await _seatService.GetForEditAsync(
+            var vm = await _flightService.GetForEditAsync(
                 id,
                 cancellationToken);
 
-            if (seat == null)
+            if (vm == null)
                 return NotFound();
 
-            return View(seat);
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-            SeatUpdateVM vm,
+            FlightUpdateVM vm,
             CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
-                var editVm = await _seatService.GetForEditAsync(
-                vm.Id,
-                cancellationToken);
+                var model = await _flightService.GetForEditAsync(
+                    vm.Id,
+                    cancellationToken);
 
-                if (editVm == null)
-                    return NotFound();
-
-                return View(editVm);
-
+                return View(model);
             }
 
-            var updated = await _seatService.UpdateAsync(
+            var updated = await _flightService.UpdateAsync(
                 vm,
                 cancellationToken);
 
             if (!updated)
                 return NotFound();
 
-            TempData["Success"] = "Seat updated successfully.";
+            TempData["Success"] = "Flight updated successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -124,14 +138,14 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             int id,
             CancellationToken cancellationToken)
         {
-            var deleted = await _seatService.DeleteAsync(
+            var deleted = await _flightService.DeleteAsync(
                 id,
                 cancellationToken);
 
             if (!deleted)
                 return NotFound();
 
-            TempData["Success"] = "Seat deleted successfully.";
+            TempData["Success"] = "Flight deleted successfully.";
 
             return RedirectToAction(nameof(Index));
         }

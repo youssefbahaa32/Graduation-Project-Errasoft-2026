@@ -1,60 +1,123 @@
 ﻿using AirlineReservationSystem.Models.Entities;
+using AirlineReservationSystem.Queries;
 using AirlineReservationSystem.Repositories.Interfaces;
 using AirlineReservationSystem.Services.Interfaces;
+using AirlineReservationSystem.ViewModels.Aircraft;
 using AirlineReservationSystem.ViewModels.Seat;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
     public class SeatService : ISeatService
     {
+        private readonly ISeatRepository _seatRepository;
+        private readonly IAircraftRepository _aircraftRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public SeatService(
+            ISeatRepository seatRepository,
+            IAircraftRepository aircraftRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper)
         {
+            _seatRepository = seatRepository;
+            _aircraftRepository = aircraftRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<SeatIndexVM>> GetAllAsync(
-        CancellationToken cancellationToken = default)
-        {
-            var seats = await _unitOfWork.Seats.GetAllAsync(
-                include: q => q.Include(s => s.Aircraft),
-                asNoTracking: true,
-                cancellationToken: cancellationToken);
+        #region Get All
 
-            return _mapper.Map<IEnumerable<SeatIndexVM>>(seats);
+        public async Task<SeatIndexVM> GetAllAsync(
+            SeatIndexVM vm,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new SeatQuery(vm);
+
+            var seats = await _seatRepository.GetAllAsync(
+                query,
+                cancellationToken);
+
+            vm.TotalCount = await _seatRepository.CountAsync(
+                query,
+                cancellationToken);
+
+            vm.Seats = _mapper.Map<List<SeatListVM>>(seats);
+
+            var aircrafts = await _aircraftRepository.GetAllAsync(
+                new BaseQuery<Aircraft>(),
+                cancellationToken);
+
+            vm.Aircrafts = aircrafts.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = $"{a.RegistrationNumber} - {a.Model}"
+            });
+
+            return vm;
         }
 
-        public async Task<SeatDetailsVM?> GetByIdAsync(
+        #endregion
+
+        #region Get For Create
+
+        public async Task<SeatCreateVM> GetForCreateAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var vm = new SeatCreateVM();
+
+            var aircrafts = await _aircraftRepository.GetAllAsync(
+                new BaseQuery<Aircraft>(),
+                cancellationToken);
+
+            vm.Aircrafts = aircrafts.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = $"{a.RegistrationNumber} - {a.Model}"
+            });
+
+            return vm;
+        }
+
+        #endregion
+
+        #region Get For Edit
+
+        public async Task<SeatUpdateVM?> GetForEditAsync(
             int id,
             CancellationToken cancellationToken = default)
         {
-            var seat = await _unitOfWork.Seats
-                .GetByIdAsync(id,include: q => q.Include(s => s.Aircraft),asNoTracking: true,cancellationToken: cancellationToken);
+            var seat = await _seatRepository.GetByIdAsync(
+                id,
+                new BaseQuery<Seat>
+                {
+                    AsNoTracking = true
+                },
+                cancellationToken);
 
             if (seat == null)
                 return null;
 
-            return _mapper.Map<SeatDetailsVM>(seat);
+            var vm = _mapper.Map<SeatUpdateVM>(seat);
+
+            var aircrafts = await _aircraftRepository.GetAllAsync(
+                new BaseQuery<Aircraft>(),
+                cancellationToken);
+
+            vm.Aircrafts = aircrafts.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = $"{a.RegistrationNumber} - {a.Model}"
+            });
+
+            return vm;
         }
 
-    public async Task<SeatUpdateVM?> GetForEditAsync(
-            int id,
-            CancellationToken cancellationToken = default)
-        {
-            var seat = await _unitOfWork.Seats
-                .GetByIdAsync(id, include: q => q.Include(s => s.Aircraft), asNoTracking: true, cancellationToken:   cancellationToken);
+        #endregion
 
-            if (seat == null)
-                return null;
-
-            return _mapper.Map<SeatUpdateVM>(seat);
-        }
+        #region Create
 
         public async Task CreateAsync(
             SeatCreateVM vm,
@@ -62,45 +125,59 @@ namespace AirlineReservationSystem.Services.Implementations
         {
             var seat = _mapper.Map<Seat>(vm);
 
-            await _unitOfWork.Seats.AddAsync(seat, cancellationToken);
+            await _seatRepository.AddAsync(
+                seat,
+                cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
+
+        #endregion
+
+        #region Update
 
         public async Task<bool> UpdateAsync(
             SeatUpdateVM vm,
             CancellationToken cancellationToken = default)
         {
-            var seat = await _unitOfWork.Seats
-                .GetByIdAsync(vm.Id, include: q => q.Include(s => s.Aircraft), asNoTracking: true, cancellationToken: cancellationToken);
+            var seat = await _seatRepository.GetByIdAsync(
+                vm.Id,
+                cancellationToken: cancellationToken);
 
             if (seat == null)
                 return false;
 
             _mapper.Map(vm, seat);
 
-            _unitOfWork.Seats.Update(seat);
+            _seatRepository.Update(seat);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;
         }
+
+        #endregion
+
+        #region Delete
 
         public async Task<bool> DeleteAsync(
             int id,
             CancellationToken cancellationToken = default)
         {
-            var seat = await _unitOfWork.Seats
-                .GetByIdAsync(id, include: q => q.Include(s => s.Aircraft), asNoTracking: true, cancellationToken: cancellationToken);
+            var seat = await _seatRepository.GetByIdAsync(
+                id,
+                cancellationToken: cancellationToken);
 
             if (seat == null)
                 return false;
 
-            _unitOfWork.Seats.Delete(seat);
+            _seatRepository.Delete(seat);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;
         }
+
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace AirlineReservationSystem.ViewModels.Flight
 {
@@ -36,5 +37,12 @@ namespace AirlineReservationSystem.ViewModels.Flight
 
         [Required]
         public FlightStatus Status { get; set; }
+
+        // Dropdowns
+        public IEnumerable<SelectListItem> Aircrafts { get; set; }
+            = Enumerable.Empty<SelectListItem>();
+
+        public IEnumerable<SelectListItem> Airports { get; set; }
+            = Enumerable.Empty<SelectListItem>();
     }
 }

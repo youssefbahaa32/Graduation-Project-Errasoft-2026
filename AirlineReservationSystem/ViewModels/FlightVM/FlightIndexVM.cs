@@ -1,25 +1,29 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AirlineReservationSystem.ViewModels.Flight
 {
-    public class FlightIndexVM
+    public class FlightIndexVM : BaseIndexVM
     {
-        public int Id { get; set; }
+        public int? AircraftId { get; set; }
 
-        public string FlightNumber { get; set; } = null!;
+        public int? DepartureAirportId { get; set; }
 
-        public string Aircraft { get; set; } = null!;
+        public int? ArrivalAirportId { get; set; }
 
-        public string DepartureAirport { get; set; } = null!;
+        public FlightStatus? Status { get; set; }
 
-        public string ArrivalAirport { get; set; } = null!;
+        public DateTime? DepartureFrom { get; set; }
 
-        public DateTime DepartureTime { get; set; }
+        public DateTime? DepartureTo { get; set; }
 
-        public DateTime ArrivalTime { get; set; }
+        public FlightSortBy SortBy { get; set; }
 
-        public decimal BasePrice { get; set; }
+        public List<FlightListVM> Flights { get; set; } = [];
 
-        public FlightStatus Status { get; set; }
+        public IEnumerable<SelectListItem> Aircrafts { get; set; }
+            = Enumerable.Empty<SelectListItem>();
+
+        public IEnumerable<SelectListItem> Airports { get; set; }
+            = Enumerable.Empty<SelectListItem>();
     }
 }

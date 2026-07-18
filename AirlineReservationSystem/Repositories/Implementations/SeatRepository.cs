@@ -1,15 +1,13 @@
-﻿public class SeatRepository
-    : GenericRepository<Seat>, ISeatRepository
-{
-    public SeatRepository(ApplicationDbContext context)
-        : base(context)
-    {
-    }
+﻿
 
-    public async Task<IEnumerable<Seat>> GetAvailableSeatsAsync(
-        int flightId,
-        CancellationToken cancellationToken = default)
+namespace AirlineReservationSystem.Repositories.Implementations
+{
+    public class SeatRepository
+        : GenericRepository<Seat>, ISeatRepository
     {
-        throw new NotImplementedException();
+        public SeatRepository(ApplicationDbContext context)
+            : base(context)
+        {
+        }
     }
 }

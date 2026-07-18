@@ -4,11 +4,11 @@ namespace AirlineReservationSystem.Services.Interfaces
 {
     public interface ISeatService
     {
-        Task<IEnumerable<SeatIndexVM>> GetAllAsync(
+        Task<SeatIndexVM> GetAllAsync(
+            SeatIndexVM vm,
             CancellationToken cancellationToken = default);
 
-        Task<SeatDetailsVM?> GetByIdAsync(
-            int id,
+        Task<SeatCreateVM> GetForCreateAsync(
             CancellationToken cancellationToken = default);
 
         Task<SeatUpdateVM?> GetForEditAsync(
