@@ -1,0 +1,144 @@
+﻿@model AirportIndexVM
+
+@{
+    ViewData["Title"] = "Airports";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h1>
+            <i class="fas fa-plane-departure me-2"></i>
+            Airports
+        </h1>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus me-1"></i>
+
+            Add Airport
+
+        </a>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <input asp-for="Search"
+                               class="form-control"
+                               placeholder="Search..." />
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <button class="btn btn-success">
+
+                            <i class="fas fa-search"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow mt-4">
+
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>IATA</th>
+                        <th>ICAO</th>
+                        <th>City</th>
+                        <th>Country</th>
+                        <th>Status</th>
+                        <th width="180">Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var airport in Model.Airports)
+                    {
+                        <tr>
+
+                            <td>@airport.Name</td>
+                            <td>@airport.IATACode</td>
+                            <td>@airport.ICAOCode</td>
+                            <td>@airport.City</td>
+                            <td>@airport.Country</td>
+                            <td>@airport.Status</td>
+
+                            <td>
+
+                                <a asp-action="Details"
+                                   asp-route-id="@airport.Id"
+                                   class="btn btn-info btn-sm">
+
+                                    <i class="fas fa-eye"></i>
+
+                                </a>
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@airport.Id"
+                                   class="btn btn-warning btn-sm">
+
+                                    <i class="fas fa-edit"></i>
+
+                                </a>
+
+                                <form asp-action="Delete"
+                                      asp-route-id="@airport.Id"
+                                      method="post"
+                                      class="d-inline">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Delete this airport?')">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

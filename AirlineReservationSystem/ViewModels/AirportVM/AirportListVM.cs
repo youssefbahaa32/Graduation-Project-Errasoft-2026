@@ -9,6 +9,7 @@
 
         public string IATACode { get; set; }=null!;
 
+
         public string ICAOCode { get; set; }= null!;
 
         public string City { get; set; } = null!;

@@ -1,0 +1,136 @@
+﻿@model FlightUpdateVM
+
+@{
+    ViewData["Title"] = "Edit Flight";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-edit me-2"></i>
+            Edit Flight
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Flight Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="FlightNumber" class="form-label"></label>
+                        <input asp-for="FlightNumber" class="form-control" />
+                        <span asp-validation-for="FlightNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="AircraftId" class="form-label"></label>
+                        <select asp-for="AircraftId"
+                                asp-items="Model.Aircrafts"
+                                class="form-select">
+                            <option value="">-- Select Aircraft --</option>
+                        </select>
+                        <span asp-validation-for="AircraftId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureAirportId" class="form-label"></label>
+                        <select asp-for="DepartureAirportId"
+                                asp-items="Model.DepartureAirports"
+                                class="form-select">
+                            <option value="">-- Select Departure Airport --</option>
+                        </select>
+                        <span asp-validation-for="DepartureAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalAirportId" class="form-label"></label>
+                        <select asp-for="ArrivalAirportId"
+                                asp-items="Model.ArrivalAirports"
+                                class="form-select">
+                            <option value="">-- Select Arrival Airport --</option>
+                        </select>
+                        <span asp-validation-for="ArrivalAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureTime" class="form-label"></label>
+                        <input asp-for="DepartureTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalTime" class="form-label"></label>
+                        <input asp-for="ArrivalTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="ArrivalTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="BasePrice" class="form-label"></label>
+                        <input asp-for="BasePrice"
+                               class="form-control" />
+                        <span asp-validation-for="BasePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label"></label>
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<FlightStatus>()"
+                                class="form-select">
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i>
+                        Update Flight
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

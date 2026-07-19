@@ -34,7 +34,10 @@ namespace AirlineReservationSystem.ViewModels.Flight
         [Required]
         public FlightStatus Status { get; set; }
         //Dropdowns
-        
+        public IEnumerable<SelectListItem> ArrivalAirports { get; set; }
+          = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> DepartureAirports { get; set; }
+            = Enumerable.Empty<SelectListItem>();
         public IEnumerable<SelectListItem> Aircrafts { get; set; }
             = Enumerable.Empty<SelectListItem>();
 

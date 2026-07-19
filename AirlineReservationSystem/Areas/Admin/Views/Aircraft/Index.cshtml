@@ -1,0 +1,198 @@
+﻿@model AircraftIndexVM
+
+@{
+    ViewData["Title"] = "Aircraft";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1>
+            <i class="fas fa-plane me-2"></i>
+            Aircraft
+        </h1>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus me-1"></i>
+
+            Add Aircraft
+
+        </a>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+
+            Search
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row">
+
+                    <div class="col-md-3">
+
+                        <input asp-for="Search"
+                               class="form-control"
+                               placeholder="Search..." />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <input asp-for="Manufacturer"
+                               class="form-control"
+                               placeholder="Manufacturer" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <input asp-for="Model"
+                               class="form-control"
+                               placeholder="Model" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<AircraftStatus>()"
+                                class="form-select">
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <button class="btn btn-success">
+
+                            <i class="fas fa-search"></i>
+
+                            Search
+
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card mt-4 shadow">
+
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>Registration</th>
+
+                        <th>Manufacturer</th>
+
+                        <th>Model</th>
+
+                        <th>Capacity</th>
+
+                        <th>Status</th>
+
+                        <th width="220">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var aircraft in Model.Aircrafts)
+                    {
+                        <tr>
+
+                            <td>@aircraft.RegistrationNumber</td>
+
+                            <td>@aircraft.Manufacturer</td>
+
+                            <td>@aircraft.Model</td>
+
+                            <td>@aircraft.Capacity</td>
+
+                            <td>@aircraft.Status</td>
+
+                            <td>
+
+                                <a asp-action="Details"
+                                   asp-route-id="@aircraft.Id"
+                                   class="btn btn-info btn-sm">
+
+                                    <i class="fas fa-eye"></i>
+
+                                </a>
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@aircraft.Id"
+                                   class="btn btn-warning btn-sm">
+
+                                    <i class="fas fa-edit"></i>
+
+                                </a>
+
+                                <form asp-action="Delete"
+                                      asp-route-id="@aircraft.Id"
+                                      method="post"
+                                      class="d-inline">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Delete this aircraft?')">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

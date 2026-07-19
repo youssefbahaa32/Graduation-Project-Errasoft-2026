@@ -44,6 +44,8 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IAirportService, AirportService>();
             builder.Services.AddScoped<IAircraftService, AircraftService>();
             builder.Services.AddScoped<ISeatService, SeatService>();
+            builder.Services.AddScoped<IFlightService, FlightService>();
+            builder.Services.AddScoped<ILookupService, LookupService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -31,7 +31,6 @@
 
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Areas\Admin\Views\" />
 	  <Folder Include="Areas\Chat\Controllers\" />
 	  <Folder Include="Areas\Chat\Views\" />
 	  <Folder Include="Areas\Identity\Controllers\" />
