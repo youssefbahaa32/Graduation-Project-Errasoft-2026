@@ -94,7 +94,6 @@ namespace AirlineReservationSystem
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}")
-                pattern: "{Area=Admin}/{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
 
