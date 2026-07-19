@@ -1,0 +1,107 @@
+﻿@model LoyaltyDetailsVM
+
+@{
+    ViewData["Title"] = "Loyalty Details";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h1>
+            <i class="fas fa-award me-2"></i>
+            Loyalty Details
+        </h1>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="fas fa-arrow-left me-1"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <ol class="breadcrumb mb-4">
+
+        <li class="breadcrumb-item">
+            <a asp-controller="Home"
+               asp-action="Index">
+                Dashboard
+            </a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a asp-action="Index">
+                Loyalty Accounts
+            </a>
+        </li>
+
+        <li class="breadcrumb-item active">
+            Details
+        </li>
+
+    </ol>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+
+            Loyalty Information
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th width="220">User</th>
+                    <td>@Model.User</td>
+                </tr>
+
+                <tr>
+                    <th>Total Points</th>
+                    <td>@Model.TotalPoints</td>
+                </tr>
+
+                <tr>
+                    <th>Created At</th>
+                    <td>@Model.CreatedAt</td>
+                </tr>
+
+                <tr>
+                    <th>Updated At</th>
+                    <td>@(Model.UpdatedAt?.ToString() ?? "-")</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        <div class="card-footer">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-warning">
+
+                <i class="fas fa-edit me-1"></i>
+
+                Edit
+
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

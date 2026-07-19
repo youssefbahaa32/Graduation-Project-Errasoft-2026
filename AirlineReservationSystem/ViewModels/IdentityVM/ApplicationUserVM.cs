@@ -1,4 +1,4 @@
-﻿namespace AirlineReservationSystem.ViewModels
+﻿namespace AirlineReservationSystem.ViewModels.IdentityVM
 {
     public class ApplicationUserVM
     {

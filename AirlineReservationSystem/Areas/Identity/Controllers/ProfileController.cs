@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AirlineReservationSystem.ViewModels.IdentityVM;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AirlineReservationSystem.Areas.Identity.Controllers
 {

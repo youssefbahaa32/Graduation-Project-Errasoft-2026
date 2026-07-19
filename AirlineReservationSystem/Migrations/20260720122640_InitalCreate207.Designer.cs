@@ -4,16 +4,19 @@ using AirlineReservationSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AirlineReservationSystem.Data.Migrations
+namespace AirlineReservationSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720122640_InitalCreate207")]
+    partial class InitalCreate207
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,13 +195,9 @@ namespace AirlineReservationSystem.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-<<<<<<< HEAD:AirlineReservationSystem/Data/Migrations/ApplicationDbContextModelSnapshot.cs
-                        .HasColumnType("bit");
-=======
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
->>>>>>> origin/master:AirlineReservationSystem/Migrations/ApplicationDbContextModelSnapshot.cs
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -1292,7 +1291,7 @@ namespace AirlineReservationSystem.Data.Migrations
                     b.HasOne("AirlineReservationSystem.Models.Entities.Aircraft", "Aircraft")
                         .WithMany("Seats")
                         .HasForeignKey("AircraftId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Aircraft");

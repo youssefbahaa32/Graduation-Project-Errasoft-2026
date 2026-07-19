@@ -1,4 +1,7 @@
 ﻿
+using AirlineReservationSystem.ViewModels.Loyalty;
+using AirlineReservationSystem.ViewModels.LoyaltyAccountVM;
+
 namespace AirlineReservationSystem.Mappings
 {
     public class MappingProfile : Profile
@@ -39,7 +42,22 @@ namespace AirlineReservationSystem.Mappings
 
             CreateMap<Flight, FlightUpdateVM>().ReverseMap();
 
-           
+            // Loyalty
+
+            CreateMap<LoyaltyAccount, LoyaltyListVM>()
+                .ForMember(
+                    dest => dest.User,
+                    opt => opt.MapFrom(src => src.User.UserName));
+
+            CreateMap<LoyaltyAccount, LoyaltyDetailsVM>()
+                .ForMember(
+                    dest => dest.User,
+                    opt => opt.MapFrom(src => src.User.UserName));
+
+            CreateMap<LoyaltyCreateVM, LoyaltyAccount>();
+
+            CreateMap<LoyaltyAccount, LoyaltyUpdateVM>()
+                .ReverseMap();
 
         }
     }
