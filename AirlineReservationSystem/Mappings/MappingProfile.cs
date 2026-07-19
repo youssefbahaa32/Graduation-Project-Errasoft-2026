@@ -6,48 +6,41 @@ namespace AirlineReservationSystem.Mappings
         public MappingProfile()
         {
             // Airport
-            CreateMap<Airport, AirportIndexVM>().ReverseMap();
-            CreateMap<Airport, AirportDetailsVM>().ReverseMap();
-            CreateMap<Airport, AirportCreateVM>().ReverseMap();
+            CreateMap<Airport, AirportListVM>();
+            CreateMap<AirportCreateVM, Airport>();
             CreateMap<Airport, AirportUpdateVM>().ReverseMap();
 
             // Aircraft
-            CreateMap<Aircraft, AircraftIndexVM>().ReverseMap();
-            CreateMap<Aircraft, AircraftDetailsVM>().ReverseMap();
-            CreateMap<Aircraft, AircraftCreateVM>().ReverseMap();
+            CreateMap<Aircraft, AircraftListVM>();
+            CreateMap<AircraftCreateVM, Aircraft>();
             CreateMap<Aircraft, AircraftUpdateVM>().ReverseMap();
 
             // Seat
-            CreateMap<Seat, SeatCreateVM>().ReverseMap();   
-            CreateMap<Seat, SeatUpdateVM>().ReverseMap();
-            CreateMap<Seat, SeatIndexVM>().ForMember(
-               dest => dest.Aircraft,
-               opt => opt.MapFrom(src => src.Aircraft.Model)); 
-            CreateMap<Seat, SeatDetailsVM>()
+            CreateMap<Seat, SeatListVM>()
                 .ForMember(
-                dest => dest.Aircraft,
-                opt => opt.MapFrom(src => src.Aircraft.Model));
+                 dest => dest.Aircraft,
+                 opt => opt.MapFrom(src => src.Aircraft.Model));
+            CreateMap<SeatCreateVM, Seat>();
+            CreateMap<Seat, SeatUpdateVM>().ReverseMap();
 
             // Flight
-            CreateMap<Flight, FlightIndexVM>().ReverseMap();
-            CreateMap<Flight, FlightDetailsVM>().ReverseMap();
-            // Index
-            CreateMap<Flight, FlightIndexVM>()
-                .ForMember(d => d.Aircraft,
-                    o => o.MapFrom(s => s.Aircraft.Model))
-                .ForMember(d => d.DepartureAirport,
-                    o => o.MapFrom(s => s.DepartureAirport.Name))
-                .ForMember(d => d.ArrivalAirport,
-                    o => o.MapFrom(s => s.ArrivalAirport.Name));
+            CreateMap<Flight, FlightListVM>()
+                .ForMember(
+                    dest => dest.Aircraft,
+                    opt => opt.MapFrom(src => src.Aircraft.Model))
+                .ForMember(
+                    dest => dest.DepartureAirport,
+                    opt => opt.MapFrom(src => src.DepartureAirport.Name))
+                .ForMember(
+                    dest => dest.ArrivalAirport,
+                    opt => opt.MapFrom(src => src.ArrivalAirport.Name));
 
-            // Details
-            CreateMap<Flight, FlightDetailsVM>()
-                .ForMember(d => d.Aircraft,
-                    o => o.MapFrom(s => s.Aircraft.Model))
-                .ForMember(d => d.DepartureAirport,
-                    o => o.MapFrom(s => s.DepartureAirport.Name))
-                .ForMember(d => d.ArrivalAirport,
-                    o => o.MapFrom(s => s.ArrivalAirport.Name));
+            CreateMap<FlightCreateVM, Flight>();
+
+            CreateMap<Flight, FlightUpdateVM>().ReverseMap();
+
+           
+
         }
     }
 }

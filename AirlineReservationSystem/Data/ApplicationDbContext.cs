@@ -21,7 +21,7 @@ namespace AirlineReservationSystem.Data
         public DbSet<FlightSeat> FlightSeats { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<BookingPassenger> BookingPassenger { get; set; }
+        public DbSet<BookingPassenger> BookingPassengers { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Baggage> Baggages { get; set; }
@@ -35,6 +35,21 @@ namespace AirlineReservationSystem.Data
             base.OnModelCreating(builder);
 
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            // Set default values for CreatedAt and IsDeleted properties 
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                if (typeof(AuditableEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    builder.Entity(entityType.ClrType)
+                        .Property(nameof(AuditableEntity.CreatedAt))
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    builder.Entity(entityType.ClrType)
+                        .Property(nameof(AuditableEntity.IsDeleted))
+                        .HasDefaultValue(false);
+                }
+            }
         }
     }
 }

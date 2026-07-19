@@ -1,11 +1,8 @@
-﻿namespace AirlineReservationSystem.Repositories.Implementations
+﻿public class FlightRepository
+    : GenericRepository<Flight>, IFlightRepository
 {
-    public class FlightRepository : IFlightRepository
+    public FlightRepository(ApplicationDbContext context)
+        : base(context)
     {
-        protected readonly ApplicationDbContext _context;
-        public FlightRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
     }
 }

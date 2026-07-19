@@ -1,15 +1,23 @@
-﻿namespace AirlineReservationSystem.ViewModels.Airport
+﻿
+namespace AirlineReservationSystem.ViewModels.AirportVM
 {
-    public class AirportIndexVM
+    public class AirportIndexVM : BaseIndexVM
     {
-        public int Id { get; set; }
+       
 
-        public string Name { get; set; } = null!;
+        // Filters
+        public AirportStatus? Status { get; set; }
 
-        public string Code { get; set; } = null!;
+        public string? Country { get; set; }
 
-        public string City { get; set; } = null!;
+        public string? City { get; set; }
+       
+        // Sorting
+        public AirportSortBy SortBy { get; set; } = AirportSortBy.CreatedAt;
 
-        public string Country { get; set; } = null!;
+        public int TotalPages => (int) Math.Ceiling((double) TotalCount / PageSize);
+
+        // Data
+        public List<AirportListVM> Airports { get; set; } = new();
     }
 }

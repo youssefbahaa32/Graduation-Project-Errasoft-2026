@@ -1,31 +1,41 @@
-﻿
-
-public class UnitOfWork : IUnitOfWork
+﻿public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
 
     public IAirportRepository Airports { get; }
 
+    public IAircraftRepository Aircrafts { get; }
+
+    public ISeatRepository Seats { get; }
+
     public IFlightRepository Flights { get; }
 
     public IBookingRepository Bookings { get; }
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(
+        ApplicationDbContext context,
+        IAirportRepository airports,
+        IAircraftRepository aircrafts,
+        ISeatRepository seats,
+        IFlightRepository flights,
+        IBookingRepository bookings)
     {
         _context = context;
 
-        Airports = new AirportRepository(context);
-        Flights = new FlightRepository(context);
-        Bookings = new BookingRepository(context);
+        Airports = airports;
+        Aircrafts = aircrafts;
+        Seats = seats;
+        Flights = flights;
+        Bookings = bookings;
     }
 
-    public async Task<int> SaveChangesAsync()
-    {
-        return await _context.SaveChangesAsync();
-    }
+    public async Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
+        => await _context.SaveChangesAsync(cancellationToken);
 
-    public void Dispose()//هذا الميثود يقوم بتحرير الموارد المستخدمة من قبل الكائن UnitOfWork عند الانتهاء من استخدامه.
+    public void Dispose()
     {
         _context.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

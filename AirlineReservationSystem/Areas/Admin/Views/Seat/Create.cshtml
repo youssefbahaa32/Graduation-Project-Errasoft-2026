@@ -1,0 +1,103 @@
+﻿@model SeatCreateVM
+
+@{
+    ViewData["Title"] = "Add Seat";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-chair me-2"></i>
+            Add Seat
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Seat Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"></div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="AircraftId" class="form-label"></label>
+
+                        <select asp-for="AircraftId"
+                                asp-items="Model.Aircrafts"
+                                class="form-select">
+
+                            <option value="">-- Select Aircraft --</option>
+
+                        </select>
+
+                        <span asp-validation-for="AircraftId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SeatNumber" class="form-label"></label>
+
+                        <input asp-for="SeatNumber"
+                               class="form-control"
+                               placeholder="Ex: A1" />
+
+                        <span asp-validation-for="SeatNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SeatClass" class="form-label"></label>
+
+                        <select asp-for="SeatClass"
+                                asp-items="Html.GetEnumSelectList<SeatClass>()"
+                                class="form-select">
+                        </select>
+
+                        <span asp-validation-for="SeatClass"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>
+                        Save
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

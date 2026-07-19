@@ -5,7 +5,6 @@ namespace AirlineReservationSystem.ViewModels.Seat
     {
         public int Id { get; set; }
 
-        public int AircraftId { get; set; }
 
         public string Aircraft { get; set; } = null!;
 

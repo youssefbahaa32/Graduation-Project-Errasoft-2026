@@ -24,7 +24,7 @@
         builder.HasOne(s => s.Aircraft)
                .WithMany(a => a.Seats)
                .HasForeignKey(s => s.AircraftId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(s => s.FlightSeats)
                .WithOne(fs => fs.Seat)
