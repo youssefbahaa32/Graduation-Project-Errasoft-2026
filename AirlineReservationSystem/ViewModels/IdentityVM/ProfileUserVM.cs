@@ -2,7 +2,7 @@
 {
     public class ProfileUserVM
     {
-        public ApplicationUserVM ApplicationUserVM { get; set; }
-        public ChangeCurrentPasswordVM ChangeCurrentPasswordVM { get; set; }
+        public required ApplicationUserVM ApplicationUserVM { get; set; }
+        public required ChangeCurrentPasswordVM ChangeCurrentPasswordVM { get; set; }
     }
 }

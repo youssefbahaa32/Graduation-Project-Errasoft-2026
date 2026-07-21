@@ -1,10 +1,4 @@
 ﻿
-using AirlineReservationSystem.ViewModels.IdentityVM;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using System.Security.Claims;
 
 namespace AirlineReservationSystem.Areas.Identity.Controllers
 {

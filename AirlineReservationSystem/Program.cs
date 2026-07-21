@@ -1,8 +1,3 @@
-using AirlineReservationSystem.Data;
-using AirlineReservationSystem.Services.Implementations;
-using AirlineReservationSystem.Services.Interfaces;
-using AirlineReservationSystem.Mappings;
-
 
 
 namespace AirlineReservationSystem
