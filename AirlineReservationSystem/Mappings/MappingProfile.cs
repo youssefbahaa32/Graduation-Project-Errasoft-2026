@@ -9,14 +9,43 @@ namespace AirlineReservationSystem.Mappings
         public MappingProfile()
         {
             // Airport
-            CreateMap<Airport, AirportListVM>();
-            CreateMap<AirportCreateVM, Airport>();
-            CreateMap<Airport, AirportUpdateVM>().ReverseMap();
+            CreateMap<Airport, AirportListVM>()
+                .ForMember(dest => dest.ImageUrl,
+                opt => opt.MapFrom(src =>
+                    src.Images
+                .Select(i => i.ImageUrl)
+                .FirstOrDefault()));
+            CreateMap<AirportCreateVM, Airport>()
+
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<AirportImage, AirportImageVM>();
+
+            CreateMap<Airport, AirportUpdateVM>()
+                .ForMember(dest => dest.ExistingImages,
+                    opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<AirportUpdateVM, Airport>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<Airport, AirportDetailsVM>();
 
             // Aircraft
-            CreateMap<Aircraft, AircraftListVM>();
-            CreateMap<AircraftCreateVM, Aircraft>();
-            CreateMap<Aircraft, AircraftUpdateVM>().ReverseMap();
+            CreateMap<Aircraft, AircraftListVM>()
+                .ForMember(dest => dest.ImageUrl,
+                opt => opt.MapFrom(src =>
+                src.Images.Select(i => i.ImageUrl).FirstOrDefault()));
+
+            CreateMap<AircraftCreateVM, Aircraft>()
+                .ForMember(x => x.Images, opt => opt.Ignore());
+
+            CreateMap<AircraftImage, AircraftImageVM>();
+
+            CreateMap<Aircraft, AircraftUpdateVM>()
+                .ForMember(dest => dest.ExistingImages,
+                    opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<AircraftUpdateVM, Aircraft>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<Aircraft, AircraftDetailsVM>();
 
             // Seat
             CreateMap<Seat, SeatListVM>()
@@ -36,11 +65,45 @@ namespace AirlineReservationSystem.Mappings
                     opt => opt.MapFrom(src => src.DepartureAirport.Name))
                 .ForMember(
                     dest => dest.ArrivalAirport,
-                    opt => opt.MapFrom(src => src.ArrivalAirport.Name));
+                    opt => opt.MapFrom(src => src.ArrivalAirport.Name))
+                .ForMember(
+                    dest => dest.ImageUrl,
+                    opt => opt.MapFrom(src => src.Aircraft.Images.Select(i => i.ImageUrl).FirstOrDefault()));
 
             CreateMap<FlightCreateVM, Flight>();
 
-            CreateMap<Flight, FlightUpdateVM>().ReverseMap();
+            CreateMap<FlightImage, FlightImageVM>();
+
+            CreateMap<Flight, FlightUpdateVM>()
+                .ForMember(dest => dest.ExistingImages,
+                    opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<FlightUpdateVM, Flight>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<Flight, FlightDetailsVM>();
+
+            //Passenger
+
+            CreateMap<PassengerCreateVM, Passenger>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<PassengerImage, PassengerImageVM>();
+
+            CreateMap<Passenger, PassengerUpdateVM>()
+                .ForMember(dest => dest.ExistingImages,
+                    opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<PassengerUpdateVM, Passenger>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<PassengerDetailsVM, Passenger>();
+
+            CreateMap<Passenger, PassengerListVM>()
+                .ForMember(dest => dest.ImageUrl,
+                opt => opt.MapFrom(src =>
+                    src.Images
+                .Select(i => i.ImageUrl)
+                .FirstOrDefault()));
 
             // Loyalty
 

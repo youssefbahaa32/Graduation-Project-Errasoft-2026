@@ -13,5 +13,6 @@
         public string City { get; set; } = null!;
 
         public string Country { get; set; } = null!;
+        public List<AirportImageVM> Images { get; set; } = [];
     }
 }

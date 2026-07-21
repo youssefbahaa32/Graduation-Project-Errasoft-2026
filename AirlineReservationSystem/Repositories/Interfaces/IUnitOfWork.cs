@@ -10,5 +10,7 @@
 
     IBookingRepository Bookings { get; }
 
+    IImageRepository Images { get; }
+   
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

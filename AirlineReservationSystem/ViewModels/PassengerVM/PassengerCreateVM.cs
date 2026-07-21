@@ -2,7 +2,7 @@
 
 namespace AirlineReservationSystem.ViewModels.PassengerVM
 {
-    public class CreatePassengerVm
+    public class PassengerCreateVM
     {
             [Required(ErrorMessage = "First name is required")]
             [StringLength(50)]
@@ -37,5 +37,6 @@ namespace AirlineReservationSystem.ViewModels.PassengerVM
             [DataType(DataType.Date)]
             [Display(Name = "Passport Expiry Date")]
             public DateTime PassportExpiryDate { get; set; }
-        }
+            public List<IFormFile> Images { get; set; } = [];
+    }
 }

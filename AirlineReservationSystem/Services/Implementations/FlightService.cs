@@ -6,6 +6,7 @@ using AirlineReservationSystem.ViewModels.Flight;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
@@ -14,6 +15,8 @@ namespace AirlineReservationSystem.Services.Implementations
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportRepository _airportRepository;
         private readonly IAircraftRepository _aircraftRepository;
+        private readonly IFlightImageRepository _imageRepository;
+        private readonly IFileService _fileService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILookupService _lookupService;
@@ -22,6 +25,8 @@ namespace AirlineReservationSystem.Services.Implementations
             IFlightRepository flightRepository,
             IAirportRepository airportRepository,
             IAircraftRepository aircraftRepository,
+            IFlightImageRepository imageRepository,
+            IFileService fileService,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILookupService lookupService)
@@ -29,6 +34,8 @@ namespace AirlineReservationSystem.Services.Implementations
             _flightRepository = flightRepository;
             _airportRepository = airportRepository;
             _aircraftRepository = aircraftRepository;
+            _imageRepository = imageRepository;
+            _fileService = fileService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _lookupService = lookupService;
@@ -133,7 +140,23 @@ namespace AirlineReservationSystem.Services.Implementations
             FlightCreateVM vm,
             CancellationToken cancellationToken = default)
         {
-            var flight = _mapper.Map<Flight>(vm);
+            var flight = _mapper.Map<Flight>(vm);// رفع الصور أولاً
+            var uploadedImages = await _fileService.UploadAsync(
+                vm.Images,
+                "Images/Flights",
+                cancellationToken);
+
+            // إنشاء FlightImage
+            foreach (var image in uploadedImages)
+            {
+                flight.Images.Add(new FlightImage
+                {
+                    ImageUrl = image.RelativePath,
+                    FileName = image.FileName,
+                    ContentType = image.ContentType
+                });
+            }
+
 
             await _flightRepository.AddAsync(
                 flight,
@@ -157,6 +180,39 @@ namespace AirlineReservationSystem.Services.Implementations
             if (flight == null)
                 return false;
 
+            if (vm.ImagesToDelete != null && vm.ImagesToDelete.Any())
+            {
+                var imagesToDelete = flight.Images
+                    .Where(i => vm.ImagesToDelete.Contains(i.Id))
+                    .ToList();
+
+                foreach (var image in imagesToDelete)
+                {
+                    // حذف الملف من wwwroot
+                    _fileService.Delete(image.ImageUrl);
+
+                    // حذف السجل من قاعدة البيانات
+                    _imageRepository.Delete(image);
+                }
+            }
+            // إضافة صور جديدة
+            if (vm.Images != null && vm.Images.Any())
+            {
+                var uploadedFiles = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Flights",
+                    cancellationToken);
+
+                foreach (var file in uploadedFiles)
+                {
+                    flight.Images.Add(new FlightImage
+                    {
+                        ImageUrl = file.RelativePath,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType
+                    });
+                }
+            }
             _mapper.Map(vm, flight);
 
             _flightRepository.Update(flight);

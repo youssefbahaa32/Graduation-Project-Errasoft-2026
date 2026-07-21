@@ -23,9 +23,9 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             var (passengers, totalCount) = await _passengerService.GetAllActivePassengersAsync(
                 searchPassport, pageNumber, pageSize, cancellationToken);
 
-            var vm = new PagedResultVm<PassengerListItemVm>
+            var vm = new PagedResultVm<PassengerListVM>
             {
-                Items = passengers.Select(p => new PassengerListItemVm
+                Items = passengers.Select(p => new PassengerListVM
                 {
                     Id = p.Id,
                     FullName = $"{p.FirstName} {p.LastName}",
@@ -50,7 +50,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             if (passenger is null)
                 return NotFound();
 
-            var vm = new PassengerDetailsVm
+            var vm = new PassengerDetailsVM
             {
                 Id = passenger.Id,
                 FirstName = passenger.FirstName,
@@ -71,31 +71,22 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
-            return View(new CreatePassengerVm());
+            return View(new PassengerCreateVM());
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreatePassengerVm vm, CancellationToken ct)
+        public async Task<IActionResult> Create(PassengerCreateVM vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
                 return View(vm);
 
-            var entity = new Passenger
-            {
-                FirstName = vm.FirstName,
-                LastName = vm.LastName,
-                DateOfBirth = vm.DateOfBirth,
-                Gender = vm.Gender,
-                Nationality = vm.Nationality,
-                PassportNumber = vm.PassportNumber,
-                PassportExpiryDate = vm.PassportExpiryDate
-            };
+            await _passengerService.AddPassengerAsync(vm, ct);
 
             try
             {
-                await _passengerService.AddPassengerAsync(entity, ct);
+                await _passengerService.AddPassengerAsync(vm, ct);
                 TempData["success-notification"] = "Passenger Added successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -113,7 +104,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             if (passenger is null)
                 return NotFound();
 
-            var vm = new EditPassengerVm
+            var vm = new PassengerUpdateVM
             {
                 Id = passenger.Id,
                 FirstName = passenger.FirstName,
@@ -131,7 +122,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, EditPassengerVm vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, PassengerUpdateVM vm, CancellationToken ct)
         {
             if (id != vm.Id)
                 return BadRequest();
@@ -139,21 +130,12 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(vm);
 
-            var entity = new Passenger
-            {
-                Id = vm.Id,
-                FirstName = vm.FirstName,
-                LastName = vm.LastName,
-                DateOfBirth = vm.DateOfBirth,
-                Gender = vm.Gender,
-                Nationality = vm.Nationality,
-                PassportNumber = vm.PassportNumber,
-                PassportExpiryDate = vm.PassportExpiryDate
-            };
-
+            var isUpdated = await _passengerService.UpdatePassengerAsync(vm, ct);
             try
             {
-                await _passengerService.UpdatePassengerAsync(entity, ct);
+                if (!isUpdated)
+                    return NotFound();
+
                 TempData["success-notification"] = "Passenger Updated successfully";
                 return RedirectToAction(nameof(Index));
             }

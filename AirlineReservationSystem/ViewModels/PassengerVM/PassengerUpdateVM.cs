@@ -1,6 +1,6 @@
 ﻿namespace AirlineReservationSystem.ViewModels.PassengerVM
 {
-    public class EditPassengerVm
+    public class PassengerUpdateVM
     {
         public int Id { get; set; }
 
@@ -37,6 +37,14 @@
         [DataType(DataType.Date)]
         [Display(Name = "Passport Expiry Date")]
         public DateTime PassportExpiryDate { get; set; }
+        // صور جديدة
+        public List<IFormFile> Images { get; set; } = [];
+
+        // الصور الحالية
+        public List<AircraftImageVM> ExistingImages { get; set; } = [];
+
+        // الصور التي اختار المستخدم حذفها
+        public List<int> ImagesToDelete { get; set; } = [];
     }
 }
 

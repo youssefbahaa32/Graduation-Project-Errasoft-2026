@@ -13,6 +13,7 @@ public class Airport : AuditableEntity//مطار
 
     public string Country { get; set; } = null!;
     public AirportStatus Status { get; set; } = AirportStatus.Active;
+    public ICollection<AirportImage> Images { get; set; } = new HashSet<AirportImage>();
 
     // Navigation properties
     public ICollection<Flight> DepartureFlights { get; set; } = new HashSet<Flight>();

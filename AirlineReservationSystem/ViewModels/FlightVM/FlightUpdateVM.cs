@@ -33,6 +33,14 @@ namespace AirlineReservationSystem.ViewModels.Flight
 
         [Required]
         public FlightStatus Status { get; set; }
+        // صور جديدة
+        public List<IFormFile> Images { get; set; } = [];
+
+        // الصور الحالية
+        public List<AircraftImageVM> ExistingImages { get; set; } = [];
+
+        // الصور التي اختار المستخدم حذفها
+        public List<int> ImagesToDelete { get; set; } = [];
         //Dropdowns
         public IEnumerable<SelectListItem> ArrivalAirports { get; set; }
           = Enumerable.Empty<SelectListItem>();

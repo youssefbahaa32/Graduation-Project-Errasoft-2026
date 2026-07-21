@@ -22,5 +22,13 @@ namespace AirlineReservationSystem.ViewModels.Aircraft
         public int Capacity { get; set; }
 
         public AircraftStatus Status { get; set; }
+        // صور جديدة
+        public List<IFormFile> Images { get; set; } = [];
+
+        // الصور الحالية
+        public List<AircraftImageVM> ExistingImages { get; set; } = [];
+
+        // الصور التي اختار المستخدم حذفها
+        public List<int> ImagesToDelete { get; set; } = [];
     }
 }

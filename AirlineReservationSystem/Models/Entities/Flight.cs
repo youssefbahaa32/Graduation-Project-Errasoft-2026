@@ -19,6 +19,8 @@ public class Flight : AuditableEntity
     public decimal BasePrice { get; set; }
 
     public FlightStatus Status { get; set; }
+    public ICollection<FlightImage> Images { get; set; }
+    = new HashSet<FlightImage>();
     // Navigation properties
     public ICollection<Booking> Bookings { get; set; }
     = new HashSet<Booking>();
