@@ -109,33 +109,48 @@ namespace AirlineReservationSystem.Services.Implementations
         public async Task CreateAsync(
             AirportCreateVM vm,
             CancellationToken cancellationToken = default)
+{
+    var airport = _mapper.Map<Airport>(vm);
+
+        List<FileUploadResult> uploadedImages = [];
+    if (vm.Images != null && vm.Images.Any())
+    {
+        uploadedImages = await _fileService.UploadAsync(
+            vm.Images,
+            "Images/Airports",
+            cancellationToken);
+
+        foreach (var image in uploadedImages)
         {
-            var airport = _mapper.Map<Airport>(vm);
-            // رفع الصور أولاً
-            var uploadedImages = await _fileService.UploadAsync(
-                vm.Images,
-                "Images/Airports",
-                cancellationToken);
-
-            // إنشاء AirportImage
-            foreach (var image in uploadedImages)
+            airport.Images!.Add(new AirportImage
             {
-                airport.Images.Add(new AirportImage
-                {
-                    ImageUrl = image.RelativePath,
-                    FileName = image.FileName,
-                    ContentType = image.ContentType
-                });
-            }
-
-            await _airportRepository.AddAsync(
-                airport,
-                cancellationToken);
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            ImageUrl = image.RelativePath,
+                FileName = image.FileName,
+                ContentType = image.ContentType
+        });
         }
+}
+try
+{
+    await _airportRepository.AddAsync(
+        airport,
+        cancellationToken);
 
-        #endregion
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+}
+catch (Exception)
+{
+
+    foreach (var file in uploadedImages)
+    {
+        _fileService.Delete(file.RelativePath);
+    }
+
+    throw;
+}
+}
+
+#endregion
 
         #region Update
 

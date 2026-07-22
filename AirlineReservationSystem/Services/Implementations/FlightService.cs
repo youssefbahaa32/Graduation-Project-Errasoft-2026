@@ -133,62 +133,75 @@ namespace AirlineReservationSystem.Services.Implementations
         }
 
         #endregion
-
         #region Create
 
         public async Task CreateAsync(
             FlightCreateVM vm,
             CancellationToken cancellationToken = default)
         {
-            var flight = _mapper.Map<Flight>(vm);// رفع الصور أولاً
-            var uploadedImages = await _fileService.UploadAsync(
-                vm.Images,
-                "Images/Flights",
-                cancellationToken);
+            var flight = _mapper.Map<Flight>(vm);
 
-            // إنشاء FlightImage
-            foreach (var image in uploadedImages)
+        
+            List<FileUploadResult> uploadedImages = [];
+            if (vm.Images != null && vm.Images.Any())
             {
-                flight.Images.Add(new FlightImage
+                uploadedImages = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Flights",
+                    cancellationToken);
+
+                foreach (var image in uploadedImages)
                 {
-                    ImageUrl = image.RelativePath,
-                    FileName = image.FileName,
-                    ContentType = image.ContentType
-                });
+                    flight.Images!.Add(new FlightImage
+                    {
+                        ImageUrl = image.RelativePath,
+                        FileName = image.FileName,
+                        ContentType = image.ContentType
+                    });
+                }
             }
 
-
-            //  الكراسي الثابتة الخاصة بالطائرة المختارة للرحلة دي ـ 
-            var staticSeats = await _unitOfWork.Seats.GetAllAsync(
-                expression: s => s.AircraftId == flight.AircraftId,
-                tracked: false,
-                cancellationToken: cancellationToken);
-
-    
-             decimal baseRate = 0.85m; //سعر ال1km
-             decimal routeBasePrice = baseRate * (decimal)flight.DistanceKm;
-
-            //  تحويل الكراسي الثابتة وتعبئتها مباشرة داخل الـ 
-            flight.FlightSeats = staticSeats.Select(ss =>
+            try
             {
-                // تحديد الـ Multiplier بناءً على درجة الكرسي
-                decimal classMultiplier = ss.SeatClass == SeatClass.Business ? 2.2m : 1.0m;
+                // الكراسي الثابتة الخاصة بالطائرة المختارة للرحلة دي
+                var staticSeats = await _unitOfWork.Seats.GetAllAsync(
+                    expression: s => s.AircraftId == flight.AircraftId,
+                    tracked: false,
+                    cancellationToken: cancellationToken);
 
-                decimal finalSeatPrice = routeBasePrice * classMultiplier ;
+                decimal baseRate = 0.85m; // سعر الـ 1km
+                decimal routeBasePrice = baseRate * (decimal)flight.DistanceKm;
 
-                return new FlightSeat
+                // تحويل الكراسي الثابتة وتعبئتها مباشرة داخل الرحلة
+                flight.FlightSeats = staticSeats.Select(ss =>
                 {
-                    SeatId = ss.Id,
-                    Price = finalSeatPrice, 
-                    Status = FlightSeatStatus.Available
-                };
-            }).ToList();
+                    // تحديد الـ Multiplier بناءً على درجة الكرسي
+                    decimal classMultiplier = ss.SeatClass == SeatClass.Business ? 2.2m : 1.0m;
+                    decimal finalSeatPrice = routeBasePrice * classMultiplier;
 
-            await _flightRepository.AddAsync(
-                flight,
-                cancellationToken);
+                    return new FlightSeat
+                    {
+                        SeatId = ss.Id,
+                        Price = finalSeatPrice,
+                        Status = FlightSeatStatus.Available
+                    };
+                }).ToList();
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _flightRepository.AddAsync(
+                    flight,
+                    cancellationToken);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                foreach (var file in uploadedImages)
+                {
+                    _fileService.Delete(file.RelativePath);
+                }
+
+                throw;
+            }
         }
 
         #endregion

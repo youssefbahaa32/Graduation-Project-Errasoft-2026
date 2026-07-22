@@ -23,7 +23,7 @@ namespace AirlineReservationSystem.ViewModels.Aircraft
 
         public AircraftStatus Status { get; set; }
         // صور جديدة
-        public List<IFormFile> Images { get; set; } = [];
+        public List<IFormFile>? Images { get; set; } = [];
 
         // الصور الحالية
         public List<AircraftImageVM> ExistingImages { get; set; } = [];
