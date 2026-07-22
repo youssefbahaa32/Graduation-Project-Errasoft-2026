@@ -1,0 +1,118 @@
+﻿@model LoyaltyUpdateVM
+
+@{
+    ViewData["Title"] = "Edit Loyalty Account";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-edit me-2"></i>
+            Edit Loyalty Account
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Dashboard</a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a asp-action="Index">Loyalty Accounts</a>
+        </li>
+
+        <li class="breadcrumb-item active">
+            Edit
+        </li>
+    </ol>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Loyalty Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="UserId"></label>
+
+                        <select asp-for="UserId"
+                                asp-items="Model.Users"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select User --
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="UserId"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="TotalPoints"></label>
+
+                        <input asp-for="TotalPoints"
+                               class="form-control" />
+
+                        <span asp-validation-for="TotalPoints"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+
+                    <button class="btn btn-primary">
+
+                        <i class="fas fa-save me-1"></i>
+
+                        Update
+
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

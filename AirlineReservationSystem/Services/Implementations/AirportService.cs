@@ -4,21 +4,28 @@ using AirlineReservationSystem.Repositories.Interfaces;
 using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.AirportVM;
 using AutoMapper;
+using Stripe;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
     public class AirportService : IAirportService
     {
         private readonly IAirportRepository _airportRepository;
+        private readonly IAirportImageRepository _imageRepository;
+        private readonly IFileService _fileService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public AirportService(
             IAirportRepository airportRepository,
+            IAirportImageRepository imageRepository,
+            IFileService fileService,
             IUnitOfWork unitOfWork,
             IMapper mapper)
         {
             _airportRepository = airportRepository;
+            _imageRepository = imageRepository;
+            _fileService = fileService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
@@ -104,6 +111,22 @@ namespace AirlineReservationSystem.Services.Implementations
             CancellationToken cancellationToken = default)
         {
             var airport = _mapper.Map<Airport>(vm);
+            // رفع الصور أولاً
+            var uploadedImages = await _fileService.UploadAsync(
+                vm.Images,
+                "Images/Airports",
+                cancellationToken);
+
+            // إنشاء AirportImage
+            foreach (var image in uploadedImages)
+            {
+                airport.Images.Add(new AirportImage
+                {
+                    ImageUrl = image.RelativePath,
+                    FileName = image.FileName,
+                    ContentType = image.ContentType
+                });
+            }
 
             await _airportRepository.AddAsync(
                 airport,
@@ -126,7 +149,39 @@ namespace AirlineReservationSystem.Services.Implementations
 
             if (airport == null)
                 return false;
+            if (vm.ImagesToDelete != null && vm.ImagesToDelete.Any())
+            {
+                var imagesToDelete = airport.Images
+                    .Where(i => vm.ImagesToDelete.Contains(i.Id))
+                    .ToList();
 
+                foreach (var image in imagesToDelete)
+                {
+                    // حذف الملف من wwwroot
+                    _fileService.Delete(image.ImageUrl);
+
+                    // حذف السجل من قاعدة البيانات
+                    _imageRepository.Delete(image);
+                }
+            }
+            // إضافة صور جديدة
+            if (vm.Images != null && vm.Images.Any())
+            {
+                var uploadedFiles = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Airports",
+                    cancellationToken);
+
+                foreach (var file in uploadedFiles)
+                {
+                    airport.Images.Add(new AirportImage
+                    {
+                        ImageUrl = file.RelativePath,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType
+                    });
+                }
+            }
             _mapper.Map(vm, airport);
 
             _airportRepository.Update(airport);

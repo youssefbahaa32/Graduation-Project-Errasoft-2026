@@ -1,8 +1,6 @@
 ﻿// System
 
 // Project Namespaces (عدّل حسب اسم مشروعك)
-global using AirlineReservationSystem;
-global using AirlineReservationSystem.Models;
 global using AirlineReservationSystem.Models.Enums;
 global using AirlineReservationSystem.Models.Common;
 global using AirlineReservationSystem.Models.Entities;
@@ -19,11 +17,13 @@ global using Microsoft.Data.SqlClient;
 global using AirlineReservationSystem.ViewModels.AirportVM;
 global using System.Linq.Expressions;
 global using AirlineReservationSystem.Queries;
+global using Microsoft.AspNetCore.Mvc.Rendering;
+global using AirlineReservationSystem.ViewModels.Loyalty;
+global using AirlineReservationSystem.ViewModels.LoyaltyAccountVM;
+global using AirlineReservationSystem.ViewModels.IdentityVM;
+global using System.Security.Claims;
+global using AirlineReservationSystem.Mappings;
 
-//global using AirlineReservationSystem.Repositories.IRepository;
-//global using AirlineReservationSystem.Services;
-//global using AirlineReservationSystem.Services.IServices;
-//VM
 global using AirlineReservationSystem.ViewModels;
 global using AirlineReservationSystem.ViewModels.Airport;
 global using AirlineReservationSystem.ViewModels.Aircraft;

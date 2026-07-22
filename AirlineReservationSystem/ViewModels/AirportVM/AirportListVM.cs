@@ -17,5 +17,7 @@
         public string Country { get; set; } = null!;
 
         public AirportStatus Status { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

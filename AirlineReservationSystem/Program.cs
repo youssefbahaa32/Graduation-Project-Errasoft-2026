@@ -1,8 +1,3 @@
-using AirlineReservationSystem.Data;
-using AirlineReservationSystem.Services.Implementations;
-using AirlineReservationSystem.Services.Interfaces;
-using AirlineReservationSystem.Mappings;
-
 
 
 namespace AirlineReservationSystem
@@ -74,6 +69,13 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<ISeatService, SeatService>();
             builder.Services.AddScoped<IFlightService, FlightService>();
             builder.Services.AddScoped<ILookupService, LookupService>();
+            builder.Services.AddScoped<IFileService, FileService>();
+
+            builder.Services.AddScoped<IImageRepository, ImageRepository>();
+            builder.Services.AddScoped<IAirportImageRepository, AirportImageRepository>();
+            builder.Services.AddScoped<IAircraftImageRepository, AircraftImageRepository>();
+            builder.Services.AddScoped<IFlightImageRepository, FlightImageRepository>();
+            builder.Services.AddScoped<IPassengerImageRepository, PassengerImageRepository>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -22,6 +22,7 @@ namespace AirlineReservationSystem.ViewModels.Airport
         [Required]
         [StringLength(100)]
         public string Country { get; set; } = null!;
+        public List<IFormFile> Images { get; set; } = [];
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace AirlineReservationSystem.ViewModels.PassengerVM
 {
-    public class PassengerDetailsVm
+    public class PassengerDetailsVM
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = null!;
@@ -11,5 +11,6 @@
         public string PassportNumber { get; set; } = null!;
         public DateTime PassportExpiryDate { get; set; }
         public List<string> BookingReferences { get; set; } = new();
+        public List<PassengerImageVM> Images { get; set; } = [];
     }
 }

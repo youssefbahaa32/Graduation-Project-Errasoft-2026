@@ -11,6 +11,8 @@
     public IFlightRepository Flights { get; }
 
     public IBookingRepository Bookings { get; }
+    
+    public IImageRepository Images { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -18,7 +20,8 @@
         IAircraftRepository aircrafts,
         ISeatRepository seats,
         IFlightRepository flights,
-        IBookingRepository bookings)
+        IBookingRepository bookings,
+        IImageRepository images)
     {
         _context = context;
 
@@ -27,6 +30,7 @@
         Seats = seats;
         Flights = flights;
         Bookings = bookings;
+        Images = images;
     }
 
     public async Task<int> SaveChangesAsync(

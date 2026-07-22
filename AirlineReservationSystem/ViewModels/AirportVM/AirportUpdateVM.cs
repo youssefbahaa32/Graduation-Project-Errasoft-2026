@@ -27,7 +27,13 @@ namespace AirlineReservationSystem.ViewModels.Airport
         [Required]
         [StringLength(100)]
         public string Country { get; set; } = null!;
+        // صور جديدة
+        public List<IFormFile> Images { get; set; } = [];
 
-       
+        // الصور الحالية
+        public List<AircraftImageVM> ExistingImages { get; set; } = [];
+
+        // الصور التي اختار المستخدم حذفها
+        public List<int> ImagesToDelete { get; set; } = [];
     }
 }

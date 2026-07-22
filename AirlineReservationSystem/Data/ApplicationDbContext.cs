@@ -30,6 +30,11 @@ namespace AirlineReservationSystem.Data
         public DbSet<PointTransaction> PointTransactions { get; set; }
         public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
 
+        public DbSet<BaseImage> Images { get; set; }
+        public DbSet<AirportImage> AirportImages { get; set; }
+        public DbSet<AircraftImage> AircraftImages { get; set; }
+        public DbSet<FlightImage> FlightImages { get; set; }
+        public DbSet<PassengerImage> PassengerImages { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

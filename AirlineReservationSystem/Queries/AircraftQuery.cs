@@ -10,7 +10,7 @@ namespace AirlineReservationSystem.Queries
         public AircraftQuery(AircraftIndexVM vm)
         {
             AsNoTracking = true;
-
+            Include = q => q.Include(a => a.Images);
             Include = q => q
                 .Include(a => a.Seats)
                 .Include(a => a.Flights);
