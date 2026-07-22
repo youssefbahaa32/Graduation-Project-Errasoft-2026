@@ -39,7 +39,6 @@
 	  <Folder Include="Areas\Identity\Views\" />
 	  <Folder Include="Areas\Customer\Views\" />
 	  <Folder Include="Data\Migrations\" />
-	  <Folder Include="Migrations\" />
 	  <Folder Include="wwwroot\Images\Aircrafts\" />
 	</ItemGroup>
 </Project>
