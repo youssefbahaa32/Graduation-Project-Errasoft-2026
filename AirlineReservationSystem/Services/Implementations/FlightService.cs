@@ -135,6 +135,32 @@ namespace AirlineReservationSystem.Services.Implementations
         {
             var flight = _mapper.Map<Flight>(vm);
 
+            //  الكراسي الثابتة الخاصة بالطائرة المختارة للرحلة دي ـ 
+            var staticSeats = await _unitOfWork.Seats.GetAllAsync(
+                expression: s => s.AircraftId == flight.AircraftId,
+                tracked: false,
+                cancellationToken: cancellationToken);
+
+    
+             decimal baseRate = 0.85m; //سعر ال1km
+             decimal routeBasePrice = baseRate * (decimal)flight.DistanceKm;
+
+            //  تحويل الكراسي الثابتة وتعبئتها مباشرة داخل الـ 
+            flight.FlightSeats = staticSeats.Select(ss =>
+            {
+                // تحديد الـ Multiplier بناءً على درجة الكرسي
+                decimal classMultiplier = ss.SeatClass == SeatClass.Business ? 2.2m : 1.0m;
+
+                decimal finalSeatPrice = routeBasePrice * classMultiplier ;
+
+                return new FlightSeat
+                {
+                    SeatId = ss.Id,
+                    Price = finalSeatPrice, 
+                    Status = FlightSeatStatus.Available
+                };
+            }).ToList();
+
             await _flightRepository.AddAsync(
                 flight,
                 cancellationToken);

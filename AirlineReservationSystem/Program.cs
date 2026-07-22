@@ -62,9 +62,9 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+            builder.Services.AddScoped<ICustomerFlightService, CustomerFlightService>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
-
+            builder.Services.AddScoped<DbInitializer>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -93,7 +93,7 @@ namespace AirlineReservationSystem
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}")
+                pattern: "{area=Identity}/{controller=Account}/{action=Register}/{id?}")
                 .WithStaticAssets();
 
 
@@ -103,9 +103,19 @@ namespace AirlineReservationSystem
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<ApplicationDbContext>();
-                await DbInitializer.SeedAsync(context);
+                try
+                {
+
+                    var dbInitializer = services.GetRequiredService<DbInitializer>();
+                    await dbInitializer.SeedAsync();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while running the Data Seeding. ");
+                }
             }
+
             app.Run();
         }
     }

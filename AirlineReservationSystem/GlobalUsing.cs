@@ -32,6 +32,8 @@ global using AirlineReservationSystem.ViewModels.Flight;
 global using AirlineReservationSystem.ViewModels.BookingVM;
 global using AirlineReservationSystem.ViewModels.PassengerVM;
 global using AirlineReservationSystem.ViewModels.PaymentVM;
+global using AirlineReservationSystem.ViewModels.TicketVM;
+global using AirlineReservationSystem.ViewModels.FlightCustomerVM;
 global using AutoMapper;
 global using AirlineReservationSystem.Services.IServices;
 global using Microsoft.AspNetCore.Identity.UI.Services;
@@ -39,7 +41,7 @@ global using Azure.Core;
 global using System.Net.Sockets;
 
 global using AirlineReservationSystem.Utility;
-global using AirlineReservationSystem.ViewModels;
+
 
 // ASP.NET Core MVC
 global using Microsoft.AspNetCore.Mvc;

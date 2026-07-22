@@ -1,10 +1,12 @@
 ﻿using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.PassengerVM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirlineReservationSystem.Areas.Admin.Controllers
 {
     [Area(SD.ADMIN_AREA)]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE} , {SD.EMPLOYEE_ROLE}")]
     public class PassengerController : Controller
     {
         private readonly IPassengerService _passengerService;
@@ -69,6 +71,8 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         }
 
 
+        [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public IActionResult Create()
         {
             return View(new CreatePassengerVm());
@@ -77,6 +81,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(CreatePassengerVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
@@ -107,6 +112,8 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         }
 
 
+        [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
             var passenger = await _passengerService.GetByIdAsync(id, ct);
@@ -131,6 +138,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, EditPassengerVm vm, CancellationToken ct)
         {
             if (id != vm.Id)
@@ -173,6 +181,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> DeleteConfirmed(int id, CancellationToken ct)
         {
             try

@@ -66,6 +66,7 @@ namespace AirlineReservationSystem.Areas.Identity.Controllers
             await _accountService.SendConfirmationMailAsync(user, Url, Request);
 
             TempData["success-notification"] = "Create Account Successfully , please check your email to verfiy";
+            await _userManager.AddToRoleAsync(user, SD.CUSTOMER_ROLE);
 
             return RedirectToAction(nameof(Login));
         }

@@ -1,19 +1,66 @@
-﻿public static class DbInitializer
+﻿public  class DbInitializer
 {
-    public static async Task SeedAsync(ApplicationDbContext context)
-    {
-        // 1. ملى المطارات والطيارات الأساسية أولاً
-        await SeedAirportsAsync(context);
-        await SeedAircraftsAsync(context);
+    private readonly ApplicationDbContext _context;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<ApplicationUser> _userManger;
+    private readonly ILogger<DbInitializer> _logger;
 
-        // 2. ملى دورة الحجز الكاملة (تذكرة، مسافر، دفع، إلخ) لو مش موجودة
-        await SeedBookingCycleAsync(context);
+    public DbInitializer(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManger,
+        ApplicationDbContext context, ILogger<DbInitializer> logger)
+    {
+        _roleManager = roleManager;
+        _userManger = userManger;
+        _context = context;
+        _logger = logger;
     }
 
-    private static async Task SeedAirportsAsync(ApplicationDbContext context)
+    
+    public async Task SeedAsync()
     {
-        // مطار القاهرة (CAI) - تم تعديل الشرط ليتأكد من الكودين منعاً للتكرار
-        await context.Database.ExecuteSqlRawAsync(@"
+        await SeedRolesAsync();
+        await SeedAirportsAsync();
+        await SeedAircraftsAsync();
+        await SeedBookingCycleAsync();
+    }
+
+    private async Task SeedRolesAsync()
+    {
+        try
+        {
+            if (!_roleManager.Roles.Any())
+            {
+                await _roleManager.CreateAsync(new IdentityRole(SD.SUPER_ADMIN_ROLE));
+                await _roleManager.CreateAsync(new IdentityRole(SD.ADMIN_ROLE));
+                await _roleManager.CreateAsync(new IdentityRole(SD.CUSTOMER_ROLE));
+                await _roleManager.CreateAsync(new IdentityRole(SD.EMPLOYEE_ROLE));
+
+                var superAdmin = new ApplicationUser()
+                {
+                    Email = "SuperAdmin@AirLine.com",
+                    EmailConfirmed = true,
+                    FirstName = "Super",
+                    LastName = "Admin",
+                    UserName = "SuperAdmin"
+                };
+
+                var result = await _userManger.CreateAsync(superAdmin, password: "Admin123$");
+
+                if (result.Succeeded)
+                {
+                    await _userManger.AddToRoleAsync(superAdmin, SD.SUPER_ADMIN_ROLE);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"{ex.Message}");
+        }
+    }
+
+  
+    private async Task SeedAirportsAsync()
+    {
+        await _context.Database.ExecuteSqlRawAsync(@"
             IF NOT EXISTS (SELECT 1 FROM Airports WHERE IATACode = 'CAI' OR ICAOCode = 'HECA')
             BEGIN
                 INSERT INTO Airports (Name, IATACode, ICAOCode, City, Country, Status, CreatedAt, IsDeleted)
@@ -21,8 +68,7 @@
             END
             ");
 
-        // مطار دبي (DXB) - عشان يكون عندك مطار الوصول جاهز للرحلات
-        await context.Database.ExecuteSqlRawAsync(@"
+        await _context.Database.ExecuteSqlRawAsync(@"
             IF NOT EXISTS (SELECT 1 FROM Airports WHERE IATACode = 'DXB' OR ICAOCode = 'OMDB')
             BEGIN
                 INSERT INTO Airports (Name, IATACode, ICAOCode, City, Country, Status, CreatedAt, IsDeleted)
@@ -31,17 +77,15 @@
             ");
     }
 
-    private static async Task SeedBookingCycleAsync(ApplicationDbContext context)
+ 
+    private async Task SeedBookingCycleAsync()
     {
-        // لو جدول الحجوزات فاضي، هننشئ الدورة كاملة متربطة ببعضها
-        if (!await context.Bookings.AnyAsync())
+        if (!await _context.Bookings.AnyAsync())
         {
-            // جلب المطارين والطيارة اللي لسه ضايفينهم فوق عشان نربط بيهم
-            var departureAirport = await context.Airports.FirstOrDefaultAsync(a => a.IATACode == "CAI");
-            var arrivalAirport = await context.Airports.FirstOrDefaultAsync(a => a.IATACode == "DXB");
-            var aircraft = await context.Set<Aircraft>().FirstOrDefaultAsync(a => a.RegistrationNumber == "SU-GDX");
+            var departureAirport = await _context.Airports.FirstOrDefaultAsync(a => a.IATACode == "CAI");
+            var arrivalAirport = await _context.Airports.FirstOrDefaultAsync(a => a.IATACode == "DXB");
+            var aircraft = await _context.Set<Aircraft>().FirstOrDefaultAsync(a => a.RegistrationNumber == "SU-GDX");
 
-            // لو ملقيناش الطيارة المعينة دي، ننشئها عشان نضمن الربط
             if (aircraft == null)
             {
                 aircraft = new Aircraft
@@ -52,10 +96,9 @@
                     Capacity = 346,
                     Status = AircraftStatus.Active
                 };
-                context.Set<Aircraft>().Add(aircraft);
+                _context.Set<Aircraft>().Add(aircraft);
             }
 
-            // إنشاء مستخدم للتجربة
             var user = new ApplicationUser
             {
                 UserName = "passenger.test@example.com",
@@ -64,9 +107,8 @@
                 FirstName = "John",
                 LastName = "Doe"
             };
-            context.Users.Add(user);
+            _context.Users.Add(user);
 
-            // إنشاء الرحلة وربطها بالمطارين والطيارة
             var flight = new Flight
             {
                 FlightNumber = "MS-777",
@@ -76,18 +118,16 @@
                 DepartureTime = DateTime.UtcNow.AddDays(2),
                 BasePrice = 400.00m
             };
-            context.Flights.Add(flight);
+            _context.Flights.Add(flight);
 
-            // إنشاء المقعد
             var seat = new Seat
             {
                 Aircraft = aircraft,
                 SeatNumber = "12A",
                 SeatClass = SeatClass.Economy
             };
-            context.Seats.Add(seat);
+            _context.Seats.Add(seat);
 
-            // إنشاء FlightSeat
             var flightSeat = new FlightSeat
             {
                 Flight = flight,
@@ -95,9 +135,8 @@
                 Price = 450.00m,
                 Status = FlightSeatStatus.Reserved
             };
-            context.Set<FlightSeat>().Add(flightSeat);
+            _context.Set<FlightSeat>().Add(flightSeat);
 
-            // إنشاء الحجز
             var booking = new Booking
             {
                 User = user,
@@ -106,9 +145,8 @@
                 Status = BookingStatus.Confirmed,
                 CreatedAt = DateTime.UtcNow
             };
-            context.Bookings.Add(booking);
+            _context.Bookings.Add(booking);
 
-            // إنشاء بيانات الدفع
             var payment = new Payment
             {
                 Booking = booking,
@@ -117,9 +155,8 @@
                 Status = PaymentStatus.Paid,
                 TransactionReference = "TXN-11223344"
             };
-            context.Payments.Add(payment);
+            _context.Payments.Add(payment);
 
-            // إنشاء المسافر
             var passenger = new Passenger
             {
                 FirstName = "Ahmed",
@@ -129,18 +166,16 @@
                 Gender = "Male",
                 Nationality = "Egyptian",
             };
-            context.Passengers.Add(passenger);
+            _context.Passengers.Add(passenger);
 
-            // إنشاء تفاصيل ربط المسافر بالحجز
             var bookingPassenger = new BookingPassenger
             {
                 Booking = booking,
                 Passenger = passenger,
                 FlightSeat = flightSeat
             };
-            context.BookingPassengers.Add(bookingPassenger);
+            _context.BookingPassengers.Add(bookingPassenger);
 
-            // إنشاء التذكرة
             var ticket = new Ticket
             {
                 TicketNumber = "TK-12345",
@@ -148,16 +183,16 @@
                 Status = TicketStatus.Issued,
                 BookingPassenger = bookingPassenger
             };
-            context.Tickets.Add(ticket);
+            _context.Tickets.Add(ticket);
 
-            // حفظ كل البيانات المترابطة دي في الـ Database مع بعض بـ Transaction واحدة أوتوماتيك
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 
-    private static async Task SeedAircraftsAsync(ApplicationDbContext context)
+   
+    private async Task SeedAircraftsAsync()
     {
-        await context.Database.ExecuteSqlRawAsync(@"
+        await _context.Database.ExecuteSqlRawAsync(@"
             IF NOT EXISTS (SELECT 1 FROM Aircrafts WHERE RegistrationNumber = 'SU-GDX')
             BEGIN
                 INSERT INTO Aircrafts (Model, Manufacturer, RegistrationNumber, Capacity, Status)
@@ -175,7 +210,6 @@
                 INSERT INTO Aircrafts (Model, Manufacturer, RegistrationNumber, Capacity, Status)
                 VALUES ('737-800', 'Boeing', 'SU-GCN', 189, 0);
             END
-            -- باقي الطائرات بتاعتك مفيش مشكلة تفضل هنا...
             ");
     }
 }

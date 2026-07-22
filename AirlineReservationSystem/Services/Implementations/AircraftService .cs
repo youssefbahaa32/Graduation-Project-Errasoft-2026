@@ -110,6 +110,26 @@ namespace AirlineReservationSystem.Services.Implementations
                 cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            // توليد 60 مقعد ثابت للطائرة (15 صف، كل صف 4 مقاعد A, B, C, D)
+            var seats = new List<Seat>();
+            char[] seatLetters = { 'A', 'B', 'C', 'D' }; 
+            int totalRows = 15; 
+
+            for (int row = 1; row <= totalRows; row++)
+            {
+                foreach (var letter in seatLetters)
+                {
+                    seats.Add(new Seat
+                    {
+                        AircraftId = aircraft.Id,
+                        SeatNumber = $"{row}{letter}", // هيولد: 1A, 1B, 1C, 1D
+                        SeatClass = row <= 3 ? SeatClass.Business : SeatClass.Economy
+                    });
+                }
+            }
+            await _unitOfWork.Seats.AddRangeAsync(seats, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         #endregion

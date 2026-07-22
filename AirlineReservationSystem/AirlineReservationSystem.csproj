@@ -37,7 +37,6 @@
 	  <Folder Include="Areas\Chat\Views\" />
 	  <Folder Include="Areas\Identity\Controllers\" />
 	  <Folder Include="Areas\Identity\Views\" />
-	  <Folder Include="Areas\Customer\Controllers\" />
 	  <Folder Include="Areas\Customer\Views\" />
 	  <Folder Include="Data\Migrations\" />
 	  <Folder Include="Migrations\" />
