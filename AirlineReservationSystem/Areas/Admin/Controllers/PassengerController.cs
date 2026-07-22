@@ -82,7 +82,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
-        public async Task<IActionResult> Create(CreatePassengerVm vm, CancellationToken ct)
+        public async Task<IActionResult> Create(PassengerCreateVM vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
                 return View(vm);
@@ -130,7 +130,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
-        public async Task<IActionResult> Edit(int id, EditPassengerVm vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, PassengerUpdateVM vm, CancellationToken ct)
         {
             if (id != vm.Id)
                 return BadRequest();
