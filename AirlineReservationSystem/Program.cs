@@ -58,6 +58,7 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICustomerFlightService, CustomerFlightService>();
+            builder.Services.AddScoped<IBookingCustomerService, BookingCustomerService>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddScoped<DbInitializer>();
 

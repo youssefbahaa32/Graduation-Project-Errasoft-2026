@@ -8,6 +8,7 @@ public class BookingPassenger : AuditableEntity //راكبًا داخل حجز �
     public int PassengerId { get; set; }
 
     public int FlightSeatId { get; set; }
+    public DateTime? ReservedUntil { get; set; } //  وبعدها الحجز يتلغىTimer الـ 10 دقايق
 
     public Booking Booking { get; set; } = null!;
 

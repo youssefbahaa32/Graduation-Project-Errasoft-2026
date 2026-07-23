@@ -13,11 +13,11 @@ namespace AirlineReservationSystem.Services.Implementations
 
         public async Task<List<FlightSearchResultVm>> SearchAsync(FlightSearchVM vm, CancellationToken cancellationToken = default)
         {
-         
             var flights = await _flightRepository.GetAllAsync(
                 expression: f => f.DepartureAirportId == vm.DepartureAirportId &&
                                   f.ArrivalAirportId == vm.ArrivalAirportId &&
                                   f.DepartureTime.Date == vm.DepartureDate.Date &&
+                                  f.DepartureTime >= DateTime.Now && // منع عرض رحلات معادها فات فعلاً في نفس اليوم
                                   f.Status == FlightStatus.Scheduled,
                 includes: [
                     f => f.DepartureAirport,
@@ -43,9 +43,8 @@ namespace AirlineReservationSystem.Services.Implementations
             .ToList();
         }
 
-        public async Task<FlightDetailsVm?> GetDetailsAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<FlightDetailsVm?> GetDetailsAsync(int id, int passengerCount, CancellationToken cancellationToken = default)
         {
-            // جلب تفاصيل الطائرة والمقاعد  المرتبطة بها
             var flight = await _flightRepository.GetOneWithIncludesAsync(
                 expression: f => f.Id == id,
                 include: q => q
@@ -56,6 +55,16 @@ namespace AirlineReservationSystem.Services.Implementations
             );
 
             if (flight is null) return null;
+
+
+            if (flight.Status != FlightStatus.Scheduled)
+                return null;
+
+            var availableSeatsCount = flight.FlightSeats.Count(fs => fs.Status == FlightSeatStatus.Available);
+
+            // لازم المقاعد المتاحة تكفي عدد الركاب المطلوب
+            if (availableSeatsCount < passengerCount)
+                return null;
 
             return new FlightDetailsVm
             {
@@ -75,5 +84,75 @@ namespace AirlineReservationSystem.Services.Implementations
             };
         }
 
+             public async Task<SeatValidationResult> ValidateSelectedSeatsAsync(
+            int flightId,
+            List<int> selectedSeatIds,
+            CancellationToken cancellationToken = default)
+        {
+            if (selectedSeatIds is null || selectedSeatIds.Count == 0)
+            {
+                return new SeatValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "You must select at least one seat."
+                };
+            }
+
+         
+            if (selectedSeatIds.Distinct().Count() != selectedSeatIds.Count)
+            {
+                return new SeatValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Duplicate seat selection detected."
+                };
+            }
+
+           
+            var flight = await _flightRepository.GetOneWithIncludesAsync(
+                expression: f => f.Id == flightId,
+                include: q => q.Include(f => f.FlightSeats),
+                tracked: false,
+                cancellationToken: cancellationToken
+            );
+
+            if (flight is null || flight.Status != FlightStatus.Scheduled)
+            {
+                return new SeatValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "This flight is no longer available."
+                };
+            }
+
+            //كلهFlightSeatوالقيمه هى الIdالمفتاح هو الDictionaryحولناها ل
+            var flightSeatsDict = flight.FlightSeats.ToDictionary(fs => fs.Id);
+
+            foreach (var seatId in selectedSeatIds)
+            {
+                // هتشوفه موجود فى الTryGetValue
+                if (!flightSeatsDict.TryGetValue(seatId, out var flightSeat))
+                {
+                    return new SeatValidationResult
+                    {
+                        IsValid = false,
+                        ErrorMessage = "One or more selected seats do not belong to this flight."
+                    };
+                }
+
+                //  المقعد لسه Available فعليًا دلوقتي (Concurrency check)
+                if (flightSeat.Status != FlightSeatStatus.Available)
+                {
+                    return new SeatValidationResult
+                    {
+                        IsValid = false,
+                        ErrorMessage = $"Seat has just been booked by someone else. Please choose a different seat."
+                    };
+                }
+            }
+
+            return new SeatValidationResult { IsValid = true };
+        }
     }
-}
+    }
+
