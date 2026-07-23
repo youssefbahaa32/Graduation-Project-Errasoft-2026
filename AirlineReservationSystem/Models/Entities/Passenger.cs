@@ -16,7 +16,7 @@ public class Passenger : AuditableEntity
     public string PassportNumber { get; set; } = null!;
 
     public DateTime PassportExpiryDate { get; set; }
-    public ICollection<PassengerImage> Images { get; set; }
+    public ICollection<PassengerImage>? Images { get; set; }
     = new HashSet<PassengerImage>();
 
     // Navigation

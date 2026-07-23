@@ -1,11 +1,12 @@
 ﻿using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.BookingVM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirlineReservationSystem.Areas.Admin.Controllers
 {
     [Area(SD.ADMIN_AREA)]
-   
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE} , {SD.EMPLOYEE_ROLE}")]
     public class BookingController : Controller
     {
         private readonly IBookingService _bookingService;
@@ -65,6 +66,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
         {
             var booking = await _bookingService.GetDetailsAsync(id, cancellationToken);
@@ -85,6 +87,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
       
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, EditBookingVM model, CancellationToken cancellationToken)
         {
             if (id != model.Id) return BadRequest();
@@ -107,6 +110,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
      
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Cancel(int id, CancellationToken cancellationToken)
         {
             try

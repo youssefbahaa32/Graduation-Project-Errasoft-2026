@@ -37,7 +37,7 @@ namespace AirlineReservationSystem.ViewModels.Flight
 
         [Required]
         public FlightStatus Status { get; set; }
-        public List<IFormFile> Images { get; set; } = [];
+        public List<IFormFile>? Images { get; set; } = [];
 
         // Dropdowns
         public IEnumerable<SelectListItem> ArrivalAirports { get; set; }

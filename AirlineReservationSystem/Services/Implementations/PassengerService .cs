@@ -62,6 +62,7 @@ namespace AirlineReservationSystem.Services.Implementations
 
         public async Task AddPassengerAsync(PassengerCreateVM vm, CancellationToken cancellationToken = default)
         {
+            
             if (vm.PassportExpiryDate <= DateTime.UtcNow)
                 throw new InvalidOperationException("Passport expiry date is invalid (already expired).");
 
@@ -73,26 +74,43 @@ namespace AirlineReservationSystem.Services.Implementations
 
             if (isDuplicate)
                 throw new InvalidOperationException("This passport number is already registered.");
+
             var passenger = _mapper.Map<Passenger>(vm);
-            // رفع الصور أولاً
-            var uploadedImages = await _fileService.UploadAsync(
-                vm.Images,
-                "Images/Passengers",
-                cancellationToken);
 
-            // إنشاء PassengerImage
-            foreach (var image in uploadedImages)
+            // 2. رفع وتجهيز الصور فقط لو المستخدم اختار صور فعلاً
+            List<FileUploadResult> uploadedImages = [];
+            if (vm.Images != null && vm.Images.Any())
             {
-                passenger.Images.Add(new PassengerImage
-                {
-                    ImageUrl = image.RelativePath,
-                    FileName = image.FileName,
-                    ContentType = image.ContentType
-                });
-            }
+                uploadedImages = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Passengers",
+                    cancellationToken);
 
-            await _passengerRepo.AddAsync(passenger, cancellationToken);
-            await _unitOfWork.SaveChangesAsync();
+                foreach (var image in uploadedImages)
+                {
+                    passenger.Images!.Add(new PassengerImage
+                    {
+                        ImageUrl = image.RelativePath,
+                        FileName = image.FileName,
+                        ContentType = image.ContentType
+                    });
+                }
+            }
+            try
+            {
+                await _passengerRepo.AddAsync(passenger, cancellationToken);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                foreach (var file in uploadedImages)
+                {
+                    _fileService.Delete(file.RelativePath);
+                }
+
+                throw;
+            }
         }
 
         public async Task<bool> UpdatePassengerAsync(PassengerUpdateVM vm, CancellationToken cancellationToken = default)

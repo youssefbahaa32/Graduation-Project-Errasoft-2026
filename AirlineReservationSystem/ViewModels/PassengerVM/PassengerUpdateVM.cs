@@ -38,7 +38,7 @@
         [Display(Name = "Passport Expiry Date")]
         public DateTime PassportExpiryDate { get; set; }
         // صور جديدة
-        public List<IFormFile> Images { get; set; } = [];
+        public List<IFormFile>? Images { get; set; } = [];
 
         // الصور الحالية
         public List<AircraftImageVM> ExistingImages { get; set; } = [];

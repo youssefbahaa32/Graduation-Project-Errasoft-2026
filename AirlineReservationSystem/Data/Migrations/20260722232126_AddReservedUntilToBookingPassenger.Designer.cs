@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AirlineReservationSystem.Migrations
+namespace AirlineReservationSystem.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260721181042_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260722232126_AddReservedUntilToBookingPassenger")]
+    partial class AddReservedUntilToBookingPassenger
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -324,6 +324,9 @@ namespace AirlineReservationSystem.Migrations
                     b.Property<int>("PassengerId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ReservedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -381,6 +384,9 @@ namespace AirlineReservationSystem.Migrations
 
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("DistanceKm")
+                        .HasColumnType("float");
 
                     b.Property<string>("FlightNumber")
                         .IsRequired()
@@ -998,6 +1004,68 @@ namespace AirlineReservationSystem.Migrations
                     b.ToTable("ApplicationUserOTPs");
                 });
 
+            modelBuilder.Entity("BaseImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("BaseImage");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1129,6 +1197,54 @@ namespace AirlineReservationSystem.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftImage", b =>
+                {
+                    b.HasBaseType("BaseImage");
+
+                    b.Property<int>("AircraftId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("AircraftId");
+
+                    b.HasDiscriminator().HasValue("AircraftImage");
+                });
+
+            modelBuilder.Entity("AirportImage", b =>
+                {
+                    b.HasBaseType("BaseImage");
+
+                    b.Property<int>("AirportId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("AirportId");
+
+                    b.HasDiscriminator().HasValue("AirportImage");
+                });
+
+            modelBuilder.Entity("FlightImage", b =>
+                {
+                    b.HasBaseType("BaseImage");
+
+                    b.Property<int>("FlightId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("FlightId");
+
+                    b.HasDiscriminator().HasValue("FlightImage");
+                });
+
+            modelBuilder.Entity("PassengerImage", b =>
+                {
+                    b.HasBaseType("BaseImage");
+
+                    b.Property<int>("PassengerId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PassengerId");
+
+                    b.HasDiscriminator().HasValue("PassengerImage");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Baggage", b =>
@@ -1379,9 +1495,55 @@ namespace AirlineReservationSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AircraftImage", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Entities.Aircraft", "Aircraft")
+                        .WithMany("Images")
+                        .HasForeignKey("AircraftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aircraft");
+                });
+
+            modelBuilder.Entity("AirportImage", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Entities.Airport", "Airport")
+                        .WithMany("Images")
+                        .HasForeignKey("AirportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Airport");
+                });
+
+            modelBuilder.Entity("FlightImage", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Entities.Flight", "Flight")
+                        .WithMany("Images")
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Flight");
+                });
+
+            modelBuilder.Entity("PassengerImage", b =>
+                {
+                    b.HasOne("AirlineReservationSystem.Models.Entities.Passenger", "Passenger")
+                        .WithMany("Images")
+                        .HasForeignKey("PassengerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Passenger");
+                });
+
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Aircraft", b =>
                 {
                     b.Navigation("Flights");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Seats");
                 });
@@ -1391,6 +1553,8 @@ namespace AirlineReservationSystem.Migrations
                     b.Navigation("ArrivalFlights");
 
                     b.Navigation("DepartureFlights");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Booking", b =>
@@ -1412,6 +1576,8 @@ namespace AirlineReservationSystem.Migrations
                     b.Navigation("Bookings");
 
                     b.Navigation("FlightSeats");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.FlightSeat", b =>
@@ -1427,6 +1593,8 @@ namespace AirlineReservationSystem.Migrations
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Passenger", b =>
                 {
                     b.Navigation("BookingPassengers");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("AirlineReservationSystem.Models.Entities.Seat", b =>

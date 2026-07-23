@@ -23,7 +23,7 @@ namespace AirlineReservationSystem.Repositories.Implementations
             _dbSet = context.Set<T>();
         }
 
-        #region --- طرق زميلك (BaseQuery) ---
+       
 
         public virtual async Task<IEnumerable<T>> GetAllAsync(BaseQuery<T>? query = null, CancellationToken cancellationToken = default)
         {
@@ -55,9 +55,6 @@ namespace AirlineReservationSystem.Repositories.Implementations
             return await result.CountAsync(cancellationToken);
         }
 
-        #endregion
-
-        #region --- الطرق بتاعتك أنتِ (Expressions & Includes) ---
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true, CancellationToken cancellationToken = default)
         {
@@ -103,9 +100,8 @@ namespace AirlineReservationSystem.Repositories.Implementations
         public async Task<int> CountAsync(Expression<Func<T, bool>>? filter = null, CancellationToken cancellationToken = default)
             => filter == null ? await _dbSet.CountAsync(cancellationToken) : await _dbSet.CountAsync(filter, cancellationToken);
 
-        #endregion
+    
 
-        #region --- الطرق المشتركة للـ CRUD ---
 
         public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default)
             => await _dbSet.AnyAsync(filter, cancellationToken);
@@ -121,6 +117,6 @@ namespace AirlineReservationSystem.Repositories.Implementations
         public virtual void Delete(T entity) => _dbSet.Remove(entity);
         public virtual void DeleteRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
 
-        #endregion
+   
     }
 }

@@ -1,11 +1,13 @@
 ﻿using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.PaymentVM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AirlineReservationSystem.Areas.Admin.Controllers
 {
     [Area(SD.ADMIN_AREA)]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE} , {SD.EMPLOYEE_ROLE}")]
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
@@ -67,6 +69,8 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             return View(vm);
         }
 
+        [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
             var vm = new CreatePaymentVm();
@@ -76,6 +80,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(CreatePaymentVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
@@ -106,6 +111,8 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
             var payment = await _paymentService.GetByIdAsync(id, ct);
@@ -128,6 +135,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, EditPaymentVm vm, CancellationToken ct)
         {
             if (id != vm.Id)
@@ -170,6 +178,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> DeleteConfirmed(int id, CancellationToken ct)
         {
             try

@@ -1,10 +1,12 @@
 ﻿using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.Flight;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirlineReservationSystem.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE} , {SD.EMPLOYEE_ROLE}")]
     public class FlightController : Controller
     {
         private readonly IFlightService _flightService;
@@ -50,6 +52,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         #region Create
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(
             CancellationToken cancellationToken)
         {
@@ -61,6 +64,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(
             FlightCreateVM vm,
             CancellationToken cancellationToken)
@@ -87,6 +91,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         #region Edit
 
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(
             int id,
             CancellationToken cancellationToken)
@@ -103,6 +108,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(
             FlightUpdateVM vm,
             CancellationToken cancellationToken)
@@ -134,6 +140,7 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE}, {SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(
             int id,
             CancellationToken cancellationToken)
