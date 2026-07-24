@@ -1,4 +1,5 @@
-
+using AirlineReservationSystem.Services.BackgroundJobs;
+using Stripe;
 
 namespace AirlineReservationSystem
 {
@@ -49,34 +50,41 @@ namespace AirlineReservationSystem
             builder.Services.AddScoped<IAircraftRepository, AircraftRepository>();
             builder.Services.AddScoped<ISeatRepository, SeatRepository>();
             builder.Services.AddScoped<IFlightRepository, FlightRepository>();
-            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();     
+            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
             builder.Services.AddScoped<IGenericRepository<ApplicationUserOTP>, GenericRepository<ApplicationUserOTP>>();
             builder.Services.AddScoped<IGenericRepository<Passenger>, GenericRepository<Passenger>>();
             builder.Services.AddScoped<IPassengerService, PassengerService>();
-            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IAccountService, Services.Implementations.AccountService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<ICustomerFlightService, CustomerFlightService>();
             builder.Services.AddScoped<IBookingCustomerService, BookingCustomerService>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddScoped<DbInitializer>();
 
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+           
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAirportService, AirportService>();
             builder.Services.AddScoped<IAircraftService, AircraftService>();
             builder.Services.AddScoped<ISeatService, SeatService>();
             builder.Services.AddScoped<IFlightService, FlightService>();
+
             builder.Services.AddScoped<ILookupService, LookupService>();
-            builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<ITicketCustomerService, TicketCustomerService>();
+            builder.Services.AddScoped<IFileService, Services.Implementations.FileService>();
+            builder.Services.AddHostedService<ExpiredBookingsCleanupService>();
 
             builder.Services.AddScoped<IImageRepository, ImageRepository>();
             builder.Services.AddScoped<IAirportImageRepository, AirportImageRepository>();
             builder.Services.AddScoped<IAircraftImageRepository, AircraftImageRepository>();
             builder.Services.AddScoped<IFlightImageRepository, FlightImageRepository>();
             builder.Services.AddScoped<IPassengerImageRepository, PassengerImageRepository>();
+
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

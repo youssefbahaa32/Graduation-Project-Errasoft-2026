@@ -1,0 +1,123 @@
+﻿@using AirlineReservationSystem.ViewModels.PaymentCustomerVM
+@model CheckoutVM
+
+@{
+    ViewData["Title"] = "Checkout — PharaohWings";
+    var errorMessage = TempData["error-notification"] as string;
+}
+
+<section style="text-align:center; padding:2rem 0; background:#1a252f; color:#fff;">
+    <div class="container">
+        <h1 style="font-family:'Cinzel',serif; color:#c5a880; font-size:2.5rem; margin-bottom:0.5rem;">Review & Pay</h1>
+        <p style="color:#e0e0e0;">Booking Reference: <strong>@Model.BookingReference</strong></p>
+    </div>
+</section>
+
+<div class="container" style="padding:2rem 0 4rem;">
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div style="background:#fdecea; border:1px solid #f5c6cb; color:#c0392b; padding:0.9rem 1.2rem; border-radius:6px; margin-bottom:1.5rem; font-weight:600;">
+            @errorMessage
+        </div>
+    }
+
+    <div style="display:grid; grid-template-columns:1fr 380px; gap:2rem; align-items:start;">
+
+        <div style="min-width:0;">
+
+            <!-- تفاصيل الرحلة -->
+            <div style="background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee; margin-bottom:1.5rem;">
+                <h4 style="margin-top:0; color:#2b3e50;">Flight @Model.FlightNumber</h4>
+                <p style="color:#777; margin:0;">
+                    @Model.DepartureAirport → @Model.ArrivalAirport
+                    &nbsp;|&nbsp; @Model.DepartureTime.ToString("dd MMM yyyy, HH:mm")
+                </p>
+            </div>
+
+            <!-- جدول تفصيل الأسعار -->
+            <div style="background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee; margin-bottom:1.5rem;">
+                <h4 style="margin-top:0; color:#2b3e50;">Price Breakdown</h4>
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #eee; text-align:left;">
+                            <th style="padding:0.5rem;">Passenger</th>
+                            <th style="padding:0.5rem;">Seat</th>
+                            <th style="padding:0.5rem; text-align:right;">Seat Price</th>
+                            <th style="padding:0.5rem; text-align:right;">Baggage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Passengers)
+                        {
+                            <tr style="border-bottom:1px solid #f2f2f2;">
+                                <td style="padding:0.6rem;">@p.FullName</td>
+                                <td style="padding:0.6rem;">@p.SeatNumber</td>
+                                <td style="padding:0.6rem; text-align:right;">@p.SeatPrice.ToString("0.00") EGP</td>
+                                <td style="padding:0.6rem; text-align:right;">@p.BaggageFee.ToString("0.00") EGP</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#777;">Flights & Seats:</span>
+                        <strong>@Model.SeatsAndFlightTotal.ToString("0.00") EGP</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#777;">Extra Luggage:</span>
+                        <strong>@Model.LuggageTotal.ToString("0.00") EGP</strong>
+                    </div>
+                    <hr style="border:0; border-top:1px solid #eee; margin:0.25rem 0;" />
+                    <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:700;">
+                        <span style="color:#2b3e50;">Grand Total:</span>
+                        <span style="color:#2b3e50;">@Model.GrandTotal.ToString("0.00") EGP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- طرق الدفع -->
+            <div style="background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee;">
+                <h4 style="margin-top:0; color:#2b3e50;">Choose Payment Method</h4>
+
+                <form asp-area="Customer" asp-controller="Payment" asp-action="Checkout" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="BookingId" value="@Model.BookingId" />
+
+                    <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+
+                        <!-- زرار الفيزا -->
+                        <button type="submit" name="PaymentMethod" value="@((int)PaymentMethod.CreditCard)"
+                                style="display:flex; align-items:center; justify-content:center; gap:0.75rem; background:#2b3e50; color:#fff; padding:1rem; border:none; border-radius:6px; font-weight:600; font-size:1rem; cursor:pointer;">
+                            💳 Pay with Visa / Mastercard
+                        </button>
+                        <p style="font-size:0.8rem; color:#999; margin:-0.5rem 0 0; text-align:center;">
+                            You'll be securely redirected to Stripe to enter your card details.
+                        </p>
+
+                        <!-- زرار النقاط -->
+                        <button type="submit" name="PaymentMethod" value="@((int)PaymentMethod.Points)"
+                                style="display:flex; align-items:center; justify-content:center; gap:0.75rem; background:#c5a880; color:#1a252f; padding:1rem; border:none; border-radius:6px; font-weight:600; font-size:1rem; cursor:pointer;">
+                            ⭐ Pay with Points
+                            <small style="font-weight:400;">(Available: @Model.AvailablePoints pts ≈ @Model.PointsValueInEGP.ToString("0.00") EGP)</small>
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <aside>
+            <div style="position:sticky; top:100px; background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.08);">
+                <h3 style="margin-top:0; color:#2b3e50;">Order Summary</h3>
+                <div style="display:flex; justify-content:space-between; margin-top:1rem;">
+                    <span style="color:#777;">Total To Pay:</span>
+                    <strong style="font-size:1.3rem; color:#2b3e50;">@Model.GrandTotal.ToString("0.00") EGP</strong>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</div>

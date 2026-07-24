@@ -23,6 +23,7 @@ global using AirlineReservationSystem.ViewModels.LoyaltyAccountVM;
 global using AirlineReservationSystem.ViewModels.IdentityVM;
 global using System.Security.Claims;
 global using AirlineReservationSystem.Mappings;
+global using AirlineReservationSystem.Services.BackgroundJobs;
 
 global using AirlineReservationSystem.ViewModels;
 global using AirlineReservationSystem.ViewModels.Airport;
@@ -34,6 +35,10 @@ global using AirlineReservationSystem.ViewModels.PassengerVM;
 global using AirlineReservationSystem.ViewModels.PaymentVM;
 global using AirlineReservationSystem.ViewModels.TicketVM;
 global using AirlineReservationSystem.ViewModels.FlightCustomerVM;
+global using AirlineReservationSystem.ViewModels.BookingCustomerVM;
+global using AirlineReservationSystem.ViewModels.PassengerCustomerVM;
+global using AirlineReservationSystem.ViewModels.PaymentCustomerVM;
+global using AirlineReservationSystem.ViewModels.LuggageCustomerVM;
 global using AutoMapper;
 global using AirlineReservationSystem.Services.IServices;
 global using Microsoft.AspNetCore.Identity.UI.Services;

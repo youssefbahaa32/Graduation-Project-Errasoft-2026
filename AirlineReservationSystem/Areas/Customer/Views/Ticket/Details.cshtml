@@ -1,0 +1,77 @@
+﻿@using AirlineReservationSystem.ViewModels.TicketCustomerVM
+@model TicketDetailsCustomerVM
+
+@{
+    ViewData["Title"] = "Ticket Details — PharaohWings";
+}
+
+<style>
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: #fff !important;
+        }
+    }
+</style>
+
+<!-- إضافة margin-top: 6rem لمنع التداخل مع الـ Nav Bar الثابت -->
+<div class="container" style="padding: 2rem 0 4rem; max-width: 700px; margin-top: 6rem;">
+
+    <!-- تنسيق علوي مرن يحتوي على العنوان وزر الطباعة في صف واحد متناسق -->
+    <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h3 style="font-family: 'Cinzel', serif; color: #2b3e50; margin: 0;">Ticket Confirmation</h3>
+
+        <button onclick="window.print()"
+                style="background: #2b3e50; color: #fff; padding: 0.6rem 1.25rem; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
+                onmouseover="this.style.background='#1a252f'"
+                onmouseout="this.style.background='#2b3e50'">
+            🖨️ Download / Print Ticket
+        </button>
+    </div>
+
+    <!-- كارت البوردينج pass -->
+    <div style="background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border: 2px dashed #c5a880; padding: 2rem;">
+
+        <div style="text-align: center; border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h2 style="font-family: 'Cinzel', serif; color: #2b3e50; margin: 0;">PharaohWings Boarding Pass</h2>
+            <p style="color: #777; margin: 0.25rem 0 0;">Ticket #@Model?.TicketNumber</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Passenger</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.PassengerFullName</p>
+            </div>
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Booking Reference</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.BookingReference</p>
+            </div>
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Flight Number</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.FlightNumber</p>
+            </div>
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Seat Number</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.SeatNumber</p>
+            </div>
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Fare Paid</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.Fare.ToString("0.00") EGP</p>
+            </div>
+            <div>
+                <span style="color: #999; font-size: 0.8rem;">Issued At</span>
+                <p style="margin: 0; font-weight: 600; color: #2b3e50;">@Model?.IssuedAt.ToString("dd MMM yyyy, HH:mm")</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #eee;">
+            <span style="background: #e8f8f0; color: #27ae60; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600;">
+                @Model?.Status
+            </span>
+        </div>
+
+    </div>
+</div>

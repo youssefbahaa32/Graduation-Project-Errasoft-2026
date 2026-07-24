@@ -1,56 +1,112 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AirlineReservationSystem</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/AirlineReservationSystem.styles.css" asp-append-version="true" />
+    <title>PharaohWings — Fly the Legacy of Egypt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/customer/styles.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     @RenderSection("Styles", false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AirlineReservationSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+
+    <header class="site-header" id="siteHeader">
+        <div class="container nav-wrap">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <div class="logo-icon">𓆙</div>
+                <span>PharaohWings</span>
             </div>
-        </nav>
+
+            <nav class="nav-links">
+                <a href="/Customer/Flight/Index" class="active">Home</a>
+                <a href="/Customer/Flight/Search">Book Flight</a>
+                <a href="/Customer/Booking/MyBookings">My Bookings</a>
+                <a href="/Customer/Ticket/MyTickets">My Tickets</a>
+                <a href="activities.html">Activities</a> <!-- ✅ جديد -->
+                <a href="loyalty.html">Loyalty</a>
+                <a href="destinations.html">Destinations</a>
+            </nav>
+
+            <div class="nav-actions">
+                <!-- نقاط الولاء المتميزة كما هي -->
+                <div class="points-badge">
+                    <span>𓋹</span>
+                    <span id="userPoints">0</span> pts
+                </div>
+
+                <!-- زر تسجيل الدخول بتنسيق الـ Outline الراقي لمنع تضارب الألوان الذهبية -->
+                <a href="/Identity/Account/Login" class="btn btn-outline" style="padding: 0.45rem 1.2rem; font-size: 0.85rem; border-radius: 50px; border-width: 1.5px;">
+                     Login
+                </a>
+
+                <!-- زر الحساب الشخصي الدائري الذهبي ليبرز بشكل مستقل -->
+                <a href="/Identity/Profile/Index" class="profile-btn" title="Profile Account" style="text-decoration: none;">
+                    <span id="profileInitial">👤</span>
+                </a>
+
+                <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
     </header>
-    <div class="container">
+
+
+    <div class="container main-container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- FOOTER -->
+    <footer class="site-footer">
         <div class="container">
-            &copy; 2026 - AirlineReservationSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="logo" style="margin-bottom:1rem"><div class="logo-icon">𓆙</div><span>PharaohWings</span></div>
+                    <p style="font-size:.9rem;opacity:.8">Egypt's premier domestic airline connecting you to the wonders of the Nile since 2020.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="booking.html">Book Flight</a></li>
+                        <li><a href="activities.html">Activities</a></li>
+                        <li><a href="loyalty.html">Loyalty Program</a></li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Destinations</h4>
+                    <ul>
+                        <li>Giza</li>
+                        <li>Luxor</li>
+                        <li>Aswan</li>
+                        <li>Hurghada</li>
+                        <li>Sharm El Sheikh</li>
+                        <li>Alexandria</li>
+                        <li>Dahab</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>📞 +20 2 1234 5678</li>
+                        <li>✉ info@pharaohwings.eg</li>
+                        <li>📍 Cairo International Airport</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PharaohWings. All rights reserved. Fly the Legacy of Egypt.</p>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
+    <script src="~/js/customer/script.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

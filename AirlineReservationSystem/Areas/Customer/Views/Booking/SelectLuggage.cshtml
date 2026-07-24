@@ -1,0 +1,140 @@
+﻿@using AirlineReservationSystem.ViewModels.LuggageCustomerVM
+@model SelectLuggageVM
+
+@{
+    ViewData["Title"] = "Select Luggage — PharaohWings";
+    var passengers = Model.Passengers ?? new List<PassengerLuggageCardVM>();
+}
+
+<section style="text-align:center; padding:2rem 0; background:#1a252f; color:#fff;">
+    <div class="container">
+        <h1 style="font-family:'Cinzel',serif; color:#c5a880; font-size:2.5rem; margin-bottom:0.5rem;">Extra Luggage</h1>
+        <p style="color:#e0e0e0;">Add extra baggage allowance for your journey. Only @Model.PricePerKg.ToString("0") EGP per extra kilogram!</p>
+    </div>
+</section>
+
+<div class="container" style="padding:2rem 0 4rem;">
+
+    <form asp-area="Customer" asp-controller="Booking" asp-action="SelectLuggage" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="BookingId" value="@Model.BookingId" />
+
+        <div style="display:grid; grid-template-columns:1fr 350px; gap:2rem; align-items:start;">
+
+            <div style="min-width:0;">
+                @if (passengers.Count == 0)
+                {
+                    <div style="text-align:center; padding:3rem; color:#777; background:#f7f7f7; border-radius:8px; border:2px dashed #ddd;">
+                        No passengers found for this booking.
+                    </div>
+                }
+
+                @foreach (var item in passengers.Select((p, idx) => new { Passenger = p, Index = idx }))
+                {
+                    <div style="background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee; margin-bottom:1.5rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
+                            <h4 style="margin:0; color:#2b3e50;">@item.Passenger.FullName</h4>
+                            <span style="background:#2b3e50; color:#fff; padding:0.25rem 0.75rem; border-radius:20px; font-size:0.85rem; font-weight:600;">
+                                Seat: @item.Passenger.SeatNumber
+                            </span>
+                        </div>
+
+                        <input type="hidden" name="Selections[@item.Index].BookingPassengerId" value="@item.Passenger.BookingPassengerId" />
+
+                        <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+                            <div style="flex:1; min-width:200px;">
+                                <label style="display:block; margin-bottom:0.5rem; font-weight:500; font-size:0.9rem;">Extra Weight (Kg)</label>
+                                <input type="number"
+                                       name="Selections[@item.Index].ExtraWeightKg"
+                                       id="weightInput_@item.Index"
+                                       class="luggage-weight-input"
+                                       min="0" max="50" step="1" value="0"
+                                       data-index="@item.Index"
+                                       style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;" />
+                            </div>
+
+                            <div style="text-align:right; min-width:120px;">
+                                <div style="font-size:0.85rem; color:#777;">Baggage Fee</div>
+                                <div style="font-size:1.25rem; font-weight:700; color:#c5a880;">
+                                    <span id="baggageCost_@item.Index">0</span> <span style="font-size:0.85rem; font-weight:400; color:#777;">EGP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <aside>
+                <div style="position:sticky; top:100px; background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.08);">
+                    <h3 style="margin-top:0; color:#2b3e50;">Price Summary</h3>
+
+                    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="color:#777;">Flight & Seats Total:</span>
+                            <span style="font-weight:600;">@Model.CurrentTotal.ToString("0.00") EGP</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="color:#777;">Extra Luggage Total:</span>
+                            <span style="font-weight:600; color:#c5a880;" id="totalLuggageFee">0.00 EGP</span>
+                        </div>
+                        <hr style="border:0; border-top:1px solid #eee; margin:0.5rem 0;" />
+                        <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:700;">
+                            <span style="color:#2b3e50;">Total To Pay:</span>
+                            <span style="color:#2b3e50;" id="grandTotalText">@Model.CurrentTotal.ToString("0.00") EGP</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" style="width:100%; margin-top:1.5rem; background:#2b3e50; color:#fff; padding:0.75rem; border:none; border-radius:4px; font-weight:600; cursor:pointer;">
+                        Proceed to Payment →
+                    </button>
+
+                    <a href="@Url.Action("Index", "Flight", new { area = "Customer" })"
+                       style="width:100%; margin-top:0.75rem; text-align:center; display:block; padding:0.75rem; border:1px solid #2b3e50; color:#2b3e50; border-radius:4px; font-weight:600; text-decoration:none;">
+                        ← Cancel & Exit
+                    </a>
+                </div>
+            </aside>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pricePerKg = parseFloat("@Model.PricePerKg");
+            const currentTotal = parseFloat("@Model.CurrentTotal");
+
+            const weightInputs = document.querySelectorAll(".luggage-weight-input");
+            const totalLuggageFeeEl = document.getElementById("totalLuggageFee");
+            const grandTotalTextEl = document.getElementById("grandTotalText");
+
+            function calculateTotals() {
+                let totalLuggageFee = 0;
+                weightInputs.forEach(input => {
+                    const index = input.getAttribute("data-index");
+                    let weight = parseFloat(input.value) || 0;
+                    if (weight < 0) weight = 0;
+                    if (weight > 50) weight = 50;
+                    input.value = weight;
+
+                    const passengerBaggageCost = weight * pricePerKg;
+                    const costEl = document.getElementById(`baggageCost_${index}`);
+                    if (costEl) costEl.textContent = passengerBaggageCost.toFixed(0);
+
+                    totalLuggageFee += passengerBaggageCost;
+                });
+
+                if (totalLuggageFeeEl) totalLuggageFeeEl.textContent = totalLuggageFee.toFixed(2) + " EGP";
+                if (grandTotalTextEl) grandTotalTextEl.textContent = (currentTotal + totalLuggageFee).toFixed(2) + " EGP";
+            }
+
+            weightInputs.forEach(input => {
+                input.addEventListener("input", calculateTotals);
+                input.addEventListener("change", calculateTotals);
+            });
+
+            calculateTotals();
+        });
+    </script>
+}

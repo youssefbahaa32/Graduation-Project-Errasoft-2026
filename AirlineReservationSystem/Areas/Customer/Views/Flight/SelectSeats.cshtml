@@ -1,0 +1,251 @@
+﻿@using AirlineReservationSystem.ViewModels.FlightCustomerVM
+@model FlightDetailsVm
+@{
+    ViewData["Title"] = "Choose Your Seat — PharaohWings";
+
+    int totalPassengers = ViewBag.PassengerCount ?? 1;
+
+    // فصل الحروف عن الأرقام وتجميع المقاعد ديناميكياً بناءً على رقم الصف القادم من الداتابيز
+    var groupedSeats = Model.Seats
+        .GroupBy(s => System.Text.RegularExpressions.Regex.Match(s.SeatNumber, @"\d+").Value)
+        .OrderBy(g => int.Parse(g.Key))
+        .ToList();
+}
+
+<!-- PAGE HEADER -->
+<section class="page-header" style="text-align: center; padding: 2rem 0; background: #1a252f; color: #fff;">
+    <div class="container">
+        <h1 style="font-family: 'Cinzel', serif; color: #c5a880; font-size: 2.5rem; margin-bottom: 0.5rem;">Choose Your Seat 𓂀</h1>
+        <p style="color: #e0e0e0; font-family: 'Inter', sans-serif;">
+            Flight: <strong>@Model.FlightNumber</strong> | Aircraft: <strong>@Model.AircraftModel</strong> | Selecting <strong>@totalPassengers</strong> Seat(s)
+        </p>
+    </div>
+</section>
+
+<!-- SEAT MAP & SUMMARY CONTAINER -->
+<div class="container" style="padding: 2rem 0 4rem; font-family: 'Inter', sans-serif;">
+    
+        @if (TempData["ErrorMessage"] != null)
+{
+    <div class="text-danger" style="text-align:center;font-weight:bold;margin-bottom:1rem;">
+        @TempData["ErrorMessage"]
+    </div>
+}
+    <!-- عرض رسائل الأخطاء من الـ ModelState (مثل حجز مقعد مأخوذ بالـ Concurrency Check) -->
+    <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 1.5rem; font-weight: bold; text-align: center; list-style: none;"></div>
+
+    <form asp-action="SelectSeats" method="post" id="seatForm">
+        <!-- الحقول المخفية المطلوبة لاستلام البيانات في أكشن الـ POST -->
+        <input type="hidden" name="FlightId" value="@Model.Id" />
+        <input type="hidden" name="Passengers" value="@totalPassengers" />
+
+        <div class="seat-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+            
+            <!-- الجزء الأيسر: خريطة مقاعد الطائرة الديناميكية -->
+            <div class="seat-map-container" style="background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                
+                <div class="plane-body" style="max-width: 450px; margin: 0 auto; border: 2px solid #2b3e50; border-radius: 60px 60px 20px 20px; padding: 4rem 2rem 2rem; background: #f9fbfd;">
+                    <div class="plane-nose" style="text-align: center; font-weight: bold; color: #c5a880; font-family: 'Cinzel', serif; margin-bottom: 2.5rem; letter-spacing: 2px;">
+                        ✈ FRONT OF AIRCRAFT
+                    </div>
+                    
+                    <div class="seat-rows-grid" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        
+                        <!-- توزيع الأعمدة الثابت المطلوب (A, B [ممر] C, D) -->
+                        <div class="row-header" style="display: grid; grid-template-columns: 1fr 1fr 40px 1fr 1fr; text-align: center; font-weight: bold; color: #2b3e50; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            <div>A</div><div>B</div><div style="color: #c5a880;">𓋹</div><div>C</div><div>D</div>
+                        </div>
+
+                        @* اللوب تدور ديناميكياً على الصفوف المتاحة للطائرة الحالية فقط بناءً على الـ Capacity *@
+                        @foreach (var rowGroup in groupedSeats)
+                        {
+                            string rowNumber = rowGroup.Key;
+
+                            <div class="plane-row" style="display: grid; grid-template-columns: 1fr 1fr 40px 1fr 1fr; gap: 8px; align-items: center; text-align: center;">
+                                
+                                @* مقاعد الجانب الأيسر A و B *@
+                                @foreach (char letter in new[] { 'A', 'B' })
+                                {
+                                    var seat = rowGroup.FirstOrDefault(s => s.SeatNumber.EndsWith(letter.ToString()));
+                                    <th:block>@Html.Raw(RenderSeatHtml(seat, $"{rowNumber}{letter}"))</th:block>
+                                }
+
+                                @* الممر الأوسط ويعرض رقم الصف حالياً *@
+                                <div class="row-number" style="font-weight: bold; color: #c5a880; font-size: 0.85rem; background: #eef2f5; border-radius: 4px; padding: 4px 0;">
+                                    @rowNumber
+                                </div>
+
+                                @* مقاعد الجانب الأيمن C و D *@
+                                @foreach (char letter in new[] { 'C', 'D' })
+                                {
+                                    var seat = rowGroup.FirstOrDefault(s => s.SeatNumber.EndsWith(letter.ToString()));
+                                    <th:block>@Html.Raw(RenderSeatHtml(seat, $"{rowNumber}{letter}"))</th:block>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- دليل الألوان (Legend) -->
+                <div class="seat-legend" style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 2.5rem; flex-wrap: wrap; font-size: 0.9rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width: 18px; height: 18px; background: #2b3e50; border-radius: 4px;"></div> Economy</div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width: 18px; height: 18px; background: #c5a880; border-radius: 4px;"></div> Business</div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width: 18px; height: 18px; background: #ffc107; border-radius: 4px;"></div> Selected</div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width: 18px; height: 18px; background: #e0e0e0; border-radius: 4px;"></div> Taken</div>
+                </div>
+                
+                <div style="text-align:center; margin-top: 1.5rem;">
+                    <a asp-action="Index" class="btn btn-ghost" style="color: #2b3e50; text-decoration: none; font-weight: 500;">← Back to Flights</a>
+                </div>
+            </div>
+            
+            <!-- الجزء الأيمن: ملخص الاختيار الجانبي (Booking Summary) -->
+            <aside>
+                <div class="booking-summary" style="background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: sticky; top: 120px;">
+                    <h3 style="font-family: 'Cinzel', serif; border-bottom: 2px solid #c5a880; padding-bottom: 0.5rem; margin-top: 0; color: #2b3e50;">Booking Summary</h3>
+                    
+                    <div id="seatSummary" style="margin: 1.5rem 0;">
+                        <p id="placeholderText" style="color: #777; text-align: center; padding: 1rem 0;">
+                            Please select exactly <strong>@totalPassengers</strong> seat(s) from the map.
+                        </p>
+                        
+                        <ul id="selectedSeatsList" style="list-style: none; padding: 0; display: none; margin: 0;"></ul>
+                        
+                        <div id="totalPriceZone" style="display: none; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #ccc;">
+                            <strong>Total Price:</strong>
+                            <span id="totalSeatPrice" style="font-size: 1.4rem; font-weight: bold; color: #c5a880; font-family: 'Cinzel';">0 EGP</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600; background: #2b3e50; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+                        Continue to Passenger Info →
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </form>
+</div>
+
+@functions {
+    // دالة ديناميكية لإنشاء هيكل المقعد بناءً على الفئة والحالة من قاعدة البيانات
+    public string RenderSeatHtml(SeatMapItemVm? seat, string seatNumber)
+    {
+        // إذا كان هناك مقعد فارغ في صفوف الطائرة هندسياً، نترك مكانه مساحة للمحافظة على المحاذاة والمظهر
+        if (seat == null) return "<div style='width:100%; height:38px;'></div>";
+
+        string seatClass = seat.SeatClass.ToString().ToLower(); 
+        bool isTaken = seat.Status != FlightSeatStatus.Available; 
+        string disabledAttr = isTaken ? "disabled" : "";
+        string statusClass = isTaken ? "taken" : "available";
+
+        string bgStyle = isTaken ? "#e0e0e0" : (seatClass == "business" ? "#c5a880" : "#2b3e50");
+        string cursorStyle = isTaken ? "not-allowed" : "pointer";
+        string colorStyle = isTaken ? "#a0a0a0" : "#fff";
+
+        return $@"
+            <div class='seat-item'>
+                <input type='checkbox' name='SelectedSeatIds' value='{seat.FlightSeatId}' id='seat_{seat.FlightSeatId}' 
+                       data-seatnumber='{seat.SeatNumber}' data-price='{seat.Price}' data-class='{seatClass}'
+                       class='seat-checkbox' {disabledAttr} style='display:none;' />
+                
+                <label for='seat_{seat.FlightSeatId}' class='seat-label {seatClass} {statusClass}' title='Seat {seat.SeatNumber} | {seat.Price} EGP'
+                       style='display: flex; align-items: center; justify-content: center; width: 100%; height: 38px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: {cursorStyle}; background: {bgStyle}; color: {colorStyle}; transition: all 0.2s;'>
+                    {seatNumber}
+                </label>
+            </div>";
+    }
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const maxPassengers = @totalPassengers;
+            const checkboxes = document.querySelectorAll(".seat-checkbox");
+            const selectedSeatsList = document.getElementById("selectedSeatsList");
+            const totalPriceZone = document.getElementById("totalPriceZone");
+            const totalSeatPrice = document.getElementById("totalSeatPrice");
+            const placeholderText = document.getElementById("placeholderText");
+            const seatForm = document.getElementById("seatForm");
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", function () {
+                    const checkedBoxes = document.querySelectorAll(".seat-checkbox:checked");
+
+                    // التحقق البرمجي لمنع اختيار مقاعد أكثر من عدد الركاب بالبحث
+                    if (checkedBoxes.length > maxPassengers) {
+                        this.checked = false;
+                        
+                        
+                        if (typeof toastr !== 'undefined') {
+                            toastr.warning(`You can only select up to ${maxPassengers} seat(s).`);
+                        } else {
+                            alert(`You can only select up to ${maxPassengers} seat(s).`);
+                        }
+                        return;
+                    }
+
+                    // تحديث الألوان مرئياً عند الاختيار
+                    const label = document.querySelector(`label[for="${this.id}"]`);
+                    if (this.checked) {
+                        label.style.background = "#ffc107"; // لون الـ Selected الافتراضي
+                        label.style.color = "#000";
+                    } else {
+                        // إرجاع اللون الأصلي بناءً على نوع درجة الكرسي
+                        const isBusiness = this.getAttribute("data-class") === "business";
+                        label.style.background = isBusiness ? "#c5a880" : "#2b3e50";
+                        label.style.color = "#fff";
+                    }
+
+                    updateSummary();
+                });
+            });
+
+            // تحديث الفاتورة والتفاصيل بالجانب الأيمن ديناميكياً
+            function updateSummary() {
+                const checkedBoxes = document.querySelectorAll(".seat-checkbox:checked");
+                selectedSeatsList.innerHTML = "";
+                let total = 0;
+
+                if (checkedBoxes.length === 0) {
+                    placeholderText.style.display = "block";
+                    selectedSeatsList.style.display = "none";
+                    totalPriceZone.style.display = "none";
+                    return;
+                }
+
+                placeholderText.style.display = "none";
+                selectedSeatsList.style.display = "block";
+                totalPriceZone.style.display = "flex";
+
+                checkedBoxes.forEach(box => {
+                    const seatNumber = box.getAttribute("data-seatnumber");
+                    const price = parseFloat(box.getAttribute("data-price"));
+                    total += price;
+
+                    const li = document.createElement("li");
+                    li.style.display = "flex";
+                    li.style.justifyContent = "space-between";
+                    li.style.padding = "0.4rem 0";
+                    li.style.borderBottom = "1px solid #f0f0f0";
+                    li.innerHTML = `<span>𓆣 Seat <strong>${seatNumber}</strong></span> <span style="font-weight:600;">${price} EGP</span>`;
+                    selectedSeatsList.appendChild(li);
+                });
+
+                totalSeatPrice.textContent = total + " EGP";
+            }
+
+            // منع العميل من تقديم الفورم والذهاب لصفحة الدفع في حال لم يختر كامل عدد المقاعد المطلوبة
+            seatForm.addEventListener("submit", function (e) {
+                const checkedBoxes = document.querySelectorAll(".seat-checkbox:checked");
+                if (checkedBoxes.length !== maxPassengers) {
+                    e.preventDefault();
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(`Please select exactly ${maxPassengers} seat(s) before proceeding.`);
+                    } else {
+                        alert(`Please select exactly ${maxPassengers} seat(s) before proceeding.`);
+                    }
+                }
+            });
+        });
+    </script>
+}

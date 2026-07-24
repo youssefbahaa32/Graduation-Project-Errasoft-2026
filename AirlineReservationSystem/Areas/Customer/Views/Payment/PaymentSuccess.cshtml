@@ -1,0 +1,75 @@
+﻿@using AirlineReservationSystem.ViewModels.PaymentCustomerVM
+@model PaymentSuccessDetailsVM
+
+@{
+    ViewData["Title"] = "Payment Successful — PharaohWings";
+    bool paidWithPoints = Model.PaymentMethod == PaymentMethod.Points;
+}
+
+<section style="min-height:70vh; display:flex; align-items:center; justify-content:center; background:#f7f7f7; padding:2rem 0;">
+    <div class="container" style="max-width:600px;">
+        <div style="background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); padding:3rem 2rem; text-align:center;">
+
+            <!-- أيقونة النجاح -->
+            <div style="width:80px; height:80px; margin:0 auto 1.5rem; background:#e8f8f0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="#27ae60" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+
+            <h1 style="font-family:'Cinzel',serif; color:#2b3e50; font-size:2rem; margin-bottom:0.5rem;">
+                Booking Confirmed!
+            </h1>
+            <p style="color:#777; margin-bottom:1.5rem;">
+                Your payment was processed successfully and your booking is now confirmed.
+            </p>
+
+            <!-- تفاصيل الدفع والحجز -->
+            <div style="background:#f9f9f9; border-radius:8px; padding:1.25rem; margin-bottom:1.5rem; text-align:left;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                    <span style="color:#777;">Booking Reference:</span>
+                    <strong style="color:#2b3e50;">@Model.BookingReference</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                    <span style="color:#777;">Payment Method:</span>
+                    <strong style="color:#2b3e50;">@(paidWithPoints ? "Points" : "Visa / Mastercard")</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#777;">Amount Paid:</span>
+                    <strong style="color:#2b3e50;">@Model.AmountPaid.ToString("0.00") EGP</strong>
+                </div>
+            </div>
+
+            <!-- ملخص نقاط الولاء في حال الدفع بالنقاط -->
+            @if (paidWithPoints)
+            {
+                <div style="background:#fdf7ec; border:1px solid #c5a880; border-radius:8px; padding:1.25rem; margin-bottom:2rem;">
+                    <h4 style="margin:0 0 0.5rem; color:#8a6d3b;">⭐ Loyalty Points Summary</h4>
+                    <p style="margin:0; color:#8a6d3b;">
+                        Your remaining points balance is
+                        <strong>@Model.RemainingPoints pts</strong>.
+                    </p>
+                </div>
+            }
+
+            <!-- أزرار التحكم والتوجيه -->
+            <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <a href="@Url.Action("MyTickets", "Ticket", new { area = "Customer" })"
+                   style="background:#c5a880; color:#1a252f; padding:0.75rem 1.5rem; border-radius:4px; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.5rem;">
+                    🎫 View My Tickets
+                </a>
+
+                <a href="@Url.Action("MyBookings", "Booking", new { area = "Customer" })"
+                   style="background:#2b3e50; color:#fff; padding:0.75rem 1.5rem; border-radius:4px; font-weight:600; text-decoration:none;">
+                    View My Bookings
+                </a>
+
+                <a href="@Url.Action("Index", "Flight", new { area = "Customer" })"
+                   style="border:1px solid #2b3e50; color:#2b3e50; padding:0.75rem 1.5rem; border-radius:4px; font-weight:600; text-decoration:none;">
+                    Book Another Flight
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
