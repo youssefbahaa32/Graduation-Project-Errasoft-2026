@@ -26,14 +26,18 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(FlightSearchVM vm, CancellationToken cancellationToken)
         {
-         
+            
+            if (vm.DepartureDate == default)
+            {
+                vm.DepartureDate = DateTime.Today;
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateAirportsViewBag();
                 return View("Index", vm);
             }
 
-          
             if (vm.DepartureAirportId == vm.ArrivalAirportId)
             {
                 ModelState.AddModelError("", "The departure airport cannot be the same as the arrival airport.");
@@ -41,14 +45,13 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
                 return View("Index", vm);
             }
 
-         
             if (vm.DepartureDate.Date < DateTime.Today)
             {
                 ModelState.AddModelError("", "Departure date cannot be in the past.");
                 await PopulateAirportsViewBag();
                 return View("Index", vm);
             }
-     
+
             if (vm.PassengerCount < 1)
             {
                 ModelState.AddModelError("", "Passenger count must be at least 1.");
@@ -57,30 +60,31 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
             }
 
             var results = await _customerFlightService.SearchAsync(vm, cancellationToken);
-
+            await PopulateAirportsViewBag();
             ViewBag.PassengerCount = vm.PassengerCount;
+            ViewBag.SearchVm = vm;
 
             return View(results);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Details(int id, int passengers, CancellationToken cancellationToken)
-        {
-           
-            if (passengers < 1) passengers = 1;
+        /*        [HttpGet]
+                public async Task<IActionResult> Details(int id, int passengers, CancellationToken cancellationToken)
+                {
 
-            var flight = await _customerFlightService.GetDetailsAsync(id, passengers, cancellationToken);
+                    if (passengers < 1) passengers = 1;
 
-            if (flight is null)
-            {
-                TempData["ErrorMessage"] = "This flight is not available for booking, or does not have enough seats for your passenger count.";
-                return RedirectToAction(nameof(Index));
-            }
+                    var flight = await _customerFlightService.GetDetailsAsync(id, passengers, cancellationToken);
 
-            ViewBag.PassengerCount = passengers;
+                    if (flight is null)
+                    {
+                        TempData["ErrorMessage"] = "This flight is not available for booking, or does not have enough seats for your passenger count.";
+                        return RedirectToAction(nameof(Index));
+                    }
 
-            return View(flight);
-        }
+                    ViewBag.PassengerCount = passengers;
+
+                    return View(flight);
+                }*/
 
         [HttpGet]
         public async Task<IActionResult> SelectSeats(int flightId, int passengers, CancellationToken cancellationToken)

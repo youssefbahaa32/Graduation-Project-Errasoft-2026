@@ -11,12 +11,15 @@ public class UnitOfWork : IUnitOfWork
     public IBookingRepository Bookings { get; }
     public IImageRepository Images { get; }
 
-    // 1. تعريف الـ Generic Repositories للجداول الجديدة
     public IGenericRepository<Passenger> Passengers { get; }
     public IGenericRepository<BookingPassenger> BookingPassengers { get; }
     public IGenericRepository<FlightSeat> FlightSeats { get; }
-
     public IGenericRepository<Baggage> Baggages { get; }
+
+   
+    public IGenericRepository<LoyaltyAccount> LoyaltyAccounts { get; }
+    public IGenericRepository<PointTransaction> PointTransactions { get; }
+    public IGenericRepository<Payment> Payments { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -39,7 +42,12 @@ public class UnitOfWork : IUnitOfWork
         Passengers = new GenericRepository<Passenger>(_context);
         BookingPassengers = new GenericRepository<BookingPassenger>(_context);
         FlightSeats = new GenericRepository<FlightSeat>(_context);
-        Baggages = new GenericRepository<Baggage>(_context); 
+        Baggages = new GenericRepository<Baggage>(_context);
+
+       
+        LoyaltyAccounts = new GenericRepository<LoyaltyAccount>(_context);
+        PointTransactions = new GenericRepository<PointTransaction>(_context);
+        Payments = new GenericRepository<Payment>(_context);
     }
 
     public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)

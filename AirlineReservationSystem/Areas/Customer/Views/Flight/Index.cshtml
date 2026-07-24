@@ -1,0 +1,140 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model AirlineReservationSystem.ViewModels.FlightCustomerVM.FlightSearchVM
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=1920&q=80')"></div>
+    <div class="hero-slide" style="background-image:url('@Url.Content("~/Images/images/luxor.jpg")')"></div>
+    <div class="hero-slide" style="background-image:url('@Url.Content("~/Images/images/Aswan.jpg")')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920&q=80')"></div>
+    <div class="hero-slide" style="background-image:url('@Url.Content("~/Images/images/Alex.jpg")')"></div>
+
+    <div class="slider-dots" id="sliderDots"></div>
+
+    <div class="hero-content">
+        <span class="hero-eyebrow">Welcome to Egypt</span>
+        <h1>Fly the <span>Legacy</span> of the Pharaohs</h1>
+        <p class="hero-sub">Discover Egypt's timeless wonders from the skies. From the Pyramids of Giza to the beaches of Dahab — your journey through history begins here.</p>
+
+        <!-- SEARCH WIDGET -->
+        <form class="search-widget" asp-area="Customer" asp-controller="Flight" asp-action="Search" method="get" id="heroSearchForm">
+            <div class="trip-toggle">
+                <button type="button" class="active" data-trip="oneway">One Way</button>
+                <button type="button" data-trip="round">Round Trip</button>
+            </div>
+            <div class="search-grid">
+                <div class="field">
+                    <label asp-for="DepartureAirportId">From</label>
+                    <select asp-for="DepartureAirportId" id="searchFrom"
+                            asp-items="@(ViewBag.Airports as List<SelectListItem>)">
+                        <option value="">-- Select departure --</option>
+                    </select>
+                    <span asp-validation-for="DepartureAirportId" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="ArrivalAirportId">To</label>
+                    <select asp-for="ArrivalAirportId" id="searchTo"
+                            asp-items="@(ViewBag.Airports as List<SelectListItem>)">
+                        <option value="">-- Select arrival --</option>
+                    </select>
+                    <span asp-validation-for="ArrivalAirportId" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="DepartureDate">Depart</label>
+                    <input asp-for="DepartureDate" id="searchDate" type="date"
+                           value="@Model.DepartureDate.ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="DepartureDate" class="text-danger"></span>
+                </div>
+                <!--
+                    Round-trip UI only — not wired to the backend yet.
+                    FlightSearchVM currently has no ReturnDate / IsRoundTrip property,
+                    so this field is disabled/ignored on submit until the VM + controller
+                    are extended to support it.
+                -->
+                <div class="field" id="returnField" style="display:none">
+                    <label>Return</label>
+                    <input type="date" id="searchReturn" name="ReturnDate" disabled />
+                </div>
+                <div class="field">
+                    <label asp-for="PassengerCount">Passengers</label>
+                    <select asp-for="PassengerCount" id="searchPax">
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            <option value="@i">@i Passenger@(i > 1 ? "s" : "")</option>
+                        }
+                    </select>
+                    <span asp-validation-for="PassengerCount" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Search ✈</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- DESTINATIONS SHOWCASE -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Explore Egypt's Wonders</h2>
+            <div class="gold-divider"></div>
+            <p>From ancient temples to pristine beaches, discover the treasures that await you across the land of the Nile.</p>
+        </div>
+        <div class="dest-grid" id="destGrid"></div>
+    </div>
+</section>
+
+<!-- LOYALTY TEASER -->
+<section class="section loyalty-teaser">
+    <div class="container">
+        <div class="loyalty-grid">
+            <div class="loyalty-text">
+                <h2>Join the <span>Pharaoh's Circle</span></h2>
+                <p>Earn points on every flight and unlock exclusive rewards. From free tickets to VIP lounge access, your journey through Egypt becomes even more rewarding.</p>
+                <div class="loyalty-stats">
+                    <div class="stat"><div class="stat-num">150+</div><div class="stat-label">Points per flight</div></div>
+                    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Elite Tiers</div></div>
+                    <div class="stat"><div class="stat-num">25%</div><div class="stat-label">Max Discount</div></div>
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='loyalty.html'">Calculate Your Points →</button>
+            </div>
+            <div class="tier-cards">
+                <div class="tier"><div class="tier-icon">𓂀</div><div class="tier-info"><h4>Silver — 0-999 pts</h4><p>5% discount on future bookings</p></div></div>
+                <div class="tier"><div class="tier-icon"></div><div class="tier-info"><h4>Gold — 1,000-4,999 pts</h4><p>10% discount + priority boarding</p></div></div>
+                <div class="tier"><div class="tier-icon"></div><div class="tier-info"><h4>Platinum — 5,000-14,999 pts</h4><p>20% discount + lounge access</p></div></div>
+                <div class="tier"><div class="tier-icon">𓆣</div><div class="tier-info"><h4>Royal — 15,000+ pts</h4><p>25% discount + free upgrades</p></div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Toggle round-trip field visibility (purely visual for now)
+    document.querySelectorAll('.trip-toggle button').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.trip-toggle button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const returnField = document.getElementById('returnField');
+            const returnInput = document.getElementById('searchReturn');
+            if (this.dataset.trip === 'round') {
+                returnField.style.display = '';
+                returnInput.disabled = false; // still ignored server-side until VM supports it
+            } else {
+                returnField.style.display = 'none';
+                returnInput.disabled = true;
+            }
+        });
+    });
+
+    // Client-side guard: from != to (server also validates this in the controller)
+    document.getElementById('heroSearchForm').addEventListener('submit', function (e) {
+        const from = document.getElementById('searchFrom').value;
+        const to = document.getElementById('searchTo').value;
+        if (from && to && from === to) {
+            e.preventDefault();
+            alert('The departure airport cannot be the same as the arrival airport.');
+        }
+    });
+</script>
+}

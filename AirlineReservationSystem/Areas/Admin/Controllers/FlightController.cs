@@ -71,8 +71,10 @@ namespace AirlineReservationSystem.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-                vm = await _flightService.GetForCreateAsync(
+                var freshData  = await _flightService.GetForCreateAsync(
                     cancellationToken);
+                vm.Airports = freshData.Airports;
+                vm.Aircrafts = freshData.Aircrafts;
 
                 return View(vm);
             }

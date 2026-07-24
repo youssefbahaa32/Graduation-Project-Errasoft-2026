@@ -1,6 +1,7 @@
-﻿using AirlineReservationSystem.ViewModels.LuggageCustomerVM;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AirlineReservationSystem.Areas.Customer.Controllers
 {
@@ -15,6 +16,8 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
         {
             _bookingService = bookingService;
         }
+
+        private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         [HttpGet]
         public async Task<IActionResult> SelectLuggage(int bookingId, CancellationToken cancellationToken)
@@ -43,6 +46,14 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
             }
 
             return RedirectToAction("Checkout", "Payment", new { area = "Customer", bookingId = result.BookingId });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> MyBookings(CancellationToken cancellationToken)
+        {
+            var bookings = await _bookingService.GetMyBookingsAsync(UserId, cancellationToken);
+            return View(bookings);
         }
     }
 }

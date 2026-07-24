@@ -22,29 +22,36 @@ namespace AirlineReservationSystem.Services.Implementations
         public async Task<IEnumerable<SelectListItem>> GetAirportsAsync(
             CancellationToken cancellationToken = default)
         {
+           
             var airports = await _airportRepository.GetAllAsync(
-                new BaseQuery<Airport>(),
-                cancellationToken);
+                expression: null,
+                includes: null,
+                tracked: false,
+                cancellationToken: cancellationToken);
 
+           
             return airports.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
                 Text = $"{a.IATACode} - {a.Name}"
-            });
+            }).ToList();
         }
 
         public async Task<IEnumerable<SelectListItem>> GetAircraftsAsync(
             CancellationToken cancellationToken = default)
         {
+          
             var aircrafts = await _aircraftRepository.GetAllAsync(
-                new BaseQuery<Aircraft>(),
-                cancellationToken);
+                expression: null,
+                includes: null,
+                tracked: false,
+                cancellationToken: cancellationToken);
 
             return aircrafts.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
                 Text = $"{a.RegistrationNumber} - {a.Model}"
-            });
+            }).ToList();
         }
     }
 }

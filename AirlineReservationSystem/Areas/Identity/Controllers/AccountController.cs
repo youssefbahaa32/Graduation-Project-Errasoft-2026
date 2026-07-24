@@ -129,7 +129,7 @@ namespace AirlineReservationSystem.Areas.Identity.Controllers
             TempData["success-notification"] = $"Welcome Back {user.FirstName} {user.LastName}";
 
 
-            return RedirectToAction("Index", "Home", new { area = "Customer" });
+            return RedirectToAction("Index", "Flight", new { area = "Customer" });
 
         }
 
@@ -332,7 +332,7 @@ namespace AirlineReservationSystem.Areas.Identity.Controllers
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return LocalRedirect(returnUrl);
 
-            return RedirectToAction("Index", "Home", new { area = "Customer" });
+            return RedirectToAction("Index", "Flight", new { area = "Customer" });
         }
 
 

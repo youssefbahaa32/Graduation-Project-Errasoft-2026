@@ -169,8 +169,8 @@ namespace AirlineReservationSystem.Services.Implementations
                     tracked: false,
                     cancellationToken: cancellationToken);
 
-                decimal baseRate = 0.85m; // سعر الـ 1km
-                decimal routeBasePrice = baseRate * (decimal)flight.DistanceKm;
+             
+                decimal routeBasePrice = flight.BasePrice; ;
 
                 // تحويل الكراسي الثابتة وتعبئتها مباشرة داخل الرحلة
                 flight.FlightSeats = staticSeats.Select(ss =>
@@ -269,13 +269,21 @@ namespace AirlineReservationSystem.Services.Implementations
             int id,
             CancellationToken cancellationToken = default)
         {
+          
+            var query = new BaseQuery<Flight>
+            {
+                Include = q => q.Include(f => f.FlightSeats)
+            };
+
             var flight = await _flightRepository.GetByIdAsync(
                 id,
-                cancellationToken: cancellationToken);
+                query, 
+                cancellationToken);
 
             if (flight == null)
                 return false;
 
+           
             _flightRepository.Delete(flight);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -291,47 +299,38 @@ namespace AirlineReservationSystem.Services.Implementations
             FlightIndexVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(
-                new BaseQuery<Airport>(),
-                cancellationToken);
+            var airports = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            var aircrafts = await _aircraftRepository.GetAllAsync(
-                new BaseQuery<Aircraft>(),
-                cancellationToken);
-
-            vm.Airports = airports.Select(a => new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = $"{a.IATACode} - {a.Name}"
-            });
-
-            vm.Aircrafts = aircrafts.Select(a => new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = $"{a.RegistrationNumber} - {a.Model}"
-            });
+            vm.Airports = airports;
+            vm.Aircrafts = aircrafts;
         }
 
         private async Task LoadDropDowns(
             FlightCreateVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(new BaseQuery<Airport>(), cancellationToken);
-            var aircrafts = await _aircraftRepository.GetAllAsync(new BaseQuery<Aircraft>(), cancellationToken);
+      
+            var airportsList = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircraftsList = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            vm.Airports = await _lookupService.GetAirportsAsync(cancellationToken);
-            vm.Aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
+            vm.Airports = airportsList;
+            vm.Aircrafts = aircraftsList;
+
+            // إذا كان الـ ViewModel يحتوي على الخواص القديمة، نؤمنها هنا أيضاً:
+            // vm.DepartureAirports = airportsList;
+            // vm.ArrivalAirports = airportsList;
         }
 
         private async Task LoadDropDowns(
             FlightUpdateVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(new BaseQuery<Airport>(), cancellationToken);
-            var aircrafts = await _aircraftRepository.GetAllAsync(new BaseQuery<Aircraft>(), cancellationToken);
+            var airportsList = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircraftsList = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            vm.Airports = await _lookupService.GetAirportsAsync(cancellationToken);
-            vm.Aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
+            vm.Airports = airportsList;
+            vm.Aircrafts = aircraftsList;
         }
 
         #endregion

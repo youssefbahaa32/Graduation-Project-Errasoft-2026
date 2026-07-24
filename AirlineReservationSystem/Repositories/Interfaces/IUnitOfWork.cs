@@ -3,21 +3,21 @@
 public interface IUnitOfWork : IDisposable
 {
     IAirportRepository Airports { get; }
-
     IAircraftRepository Aircrafts { get; }
-
     ISeatRepository Seats { get; }
-
     IFlightRepository Flights { get; }
-
     IBookingRepository Bookings { get; }
-
     IImageRepository Images { get; }
 
     IGenericRepository<Passenger> Passengers { get; }
     IGenericRepository<BookingPassenger> BookingPassengers { get; }
     IGenericRepository<FlightSeat> FlightSeats { get; }
     IGenericRepository<Baggage> Baggages { get; }
+
+  
+    IGenericRepository<LoyaltyAccount> LoyaltyAccounts { get; }
+    IGenericRepository<PointTransaction> PointTransactions { get; }
+    IGenericRepository<Payment> Payments { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

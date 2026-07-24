@@ -1,6 +1,7 @@
 ﻿using AirlineReservationSystem.ViewModels.PassengerCustomerVM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AirlineReservationSystem.Areas.Customer.Controllers
 {
@@ -22,15 +23,15 @@ namespace AirlineReservationSystem.Areas.Customer.Controllers
 
             if (seatIdList.Count == 0)
             {
-                TempData["ErrorMessage"] = "No seats selected.";
+                TempData["ErrorMessage"] = "No seats were selected. Please choose your seats again.";
                 return RedirectToAction("Index", "Flight", new { area = "Customer" });
             }
 
-            var vm = await _bookingService.BuildPassengerInfoFormAsync(flightId, seatIdList, cancellationToken);
+            var (vm, error) = await _bookingService.BuildPassengerInfoFormAsync(flightId, seatIdList, cancellationToken);
 
             if (vm is null)
             {
-                TempData["ErrorMessage"] = "One or more selected seats are no longer available. Please select your seats again.";
+                TempData["ErrorMessage"] = error ?? "One or more selected seats are no longer available.";
                 return RedirectToAction("SelectSeats", "Flight", new { area = "Customer", flightId, passengers = seatIdList.Count });
             }
 
