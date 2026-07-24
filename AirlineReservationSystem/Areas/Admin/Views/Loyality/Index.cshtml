@@ -1,0 +1,201 @@
+﻿@model LoyaltyIndexVM
+
+@{
+    ViewData["Title"] = "Loyalty Accounts";
+}
+
+<div class="container-fluid px-4">
+
+    <h1 class="mt-4">Loyalty Accounts</h1>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">
+            Loyalty Accounts
+        </li>
+    </ol>
+
+    <div class="card mb-4">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+
+            <span>
+                <i class="fas fa-award me-1"></i>
+                Loyalty Accounts
+            </span>
+
+            <a asp-action="Create"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i>
+                Add Loyalty Account
+            </a>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row mb-3">
+
+                    <div class="col-md-4">
+                        <input asp-for="Search"
+                               class="form-control"
+                               placeholder="Search by User Name or Email" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <select asp-for="UserId"
+                                asp-items="Model.Users"
+                                class="form-select">
+                            <option value="">All Users</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <select asp-for="SortBy"
+                                class="form-select">
+
+                            <option value="User">User</option>
+
+                            <option value="TotalPoints">
+                                Total Points
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+
+                        <button class="btn btn-success">
+
+                            <i class="fas fa-search"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+            <table class="table table-bordered table-striped">
+
+                <thead>
+
+                    <tr>
+
+                        <th>User</th>
+
+                        <th>Total Points</th>
+
+                        <th width="180">Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.LoyaltyAccounts.Any())
+                    {
+                        @foreach (var item in Model.LoyaltyAccounts)
+                        {
+                            <tr>
+
+                                <td>@item.User</td>
+
+                                <td>@item.TotalPoints</td>
+
+                                <td>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-info btn-sm">
+
+                                        <i class="fas fa-eye"></i>
+
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-warning btn-sm">
+
+                                        <i class="fas fa-edit"></i>
+
+                                    </a>
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@item.Id"
+                                          method="post"
+                                          class="d-inline">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Delete this loyalty account?')">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="3"
+                                class="text-center">
+
+                                No Loyalty Accounts Found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+            <div class="d-flex justify-content-between">
+
+                <span>
+
+                    Total Records :
+                    <strong>@Model.TotalCount</strong>
+
+                </span>
+
+                <span>
+
+                    Page
+
+                    <strong>@Model.Page</strong>
+
+                    of
+
+                    <strong>@Model.TotalPages</strong>
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

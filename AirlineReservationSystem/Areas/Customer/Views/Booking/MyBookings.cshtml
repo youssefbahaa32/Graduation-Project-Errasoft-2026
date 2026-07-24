@@ -1,0 +1,76 @@
+﻿@using AirlineReservationSystem.ViewModels.BookingCustomerVM
+@model List<MyBookingItemVM>
+
+@{
+    ViewData["Title"] = "My Bookings — PharaohWings";
+}
+
+<section style="text-align:center; padding:2rem 0; background:#1a252f; color:#fff;">
+    <div class="container">
+        <h1 style="font-family:'Cinzel',serif; color:#c5a880; font-size:2.5rem; margin-bottom:0.5rem;">My Bookings</h1>
+        <p style="color:#e0e0e0;">Track and review all your flight reservations.</p>
+    </div>
+</section>
+
+<div class="container" style="padding:2rem 0 4rem;">
+
+    @if (Model.Count == 0)
+    {
+        <div style="text-align:center; padding:4rem; color:#777; background:#f7f7f7; border-radius:8px; border:2px dashed #ddd;">
+            <p style="font-size:1.1rem; margin-bottom:1rem;">You don't have any bookings yet.</p>
+            <a href="@Url.Action("Index", "Flight", new { area = "Customer" })"
+               style="background:#2b3e50; color:#fff; padding:0.75rem 1.5rem; border-radius:4px; font-weight:600; text-decoration:none;">
+                Book a Flight
+            </a>
+        </div>
+    }
+    else
+    {
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            @foreach (var b in Model)
+            {
+                var (statusColor, statusBg) = b.Status switch
+                {
+                    BookingStatus.Confirmed => ("#27ae60", "#e8f8f0"),
+                    BookingStatus.Pending => ("#e67e22", "#fdf1e3"),
+                    BookingStatus.Cancelled => ("#c0392b", "#fdecea"),
+                    _ => ("#777", "#f2f2f2")
+                };
+
+                <div style="background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+
+                    <div style="min-width:200px;">
+                        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+                            <h4 style="margin:0; color:#2b3e50;">@b.BookingReference</h4>
+                            <span style="background:@statusBg; color:@statusColor; padding:0.2rem 0.7rem; border-radius:20px; font-size:0.8rem; font-weight:600;">
+                                @b.Status
+                            </span>
+                        </div>
+                        <p style="margin:0; color:#777; font-size:0.9rem;">
+                            Flight @b.FlightNumber &nbsp;|&nbsp; @b.DepartureTime.ToString("dd MMM yyyy, HH:mm")
+                        </p>
+                        <p style="margin:0.25rem 0 0; color:#999; font-size:0.85rem;">
+                            @b.PassengerCount passenger(s)
+                        </p>
+                    </div>
+
+                    <div style="text-align:right;">
+                        <div style="font-size:1.1rem; font-weight:700; color:#2b3e50; margin-bottom:0.5rem;">
+                            @b.TotalAmount.ToString("0.00") EGP
+                        </div>
+
+                        @if (b.Status == BookingStatus.Pending)
+                        {
+                            <a href="@Url.Action("Checkout", "Payment", new { area = "Customer", bookingId = b.BookingId })"
+                               style="background:#2b3e50; color:#fff; padding:0.5rem 1rem; border-radius:4px; font-weight:600; text-decoration:none; font-size:0.9rem;">
+                                Complete Payment
+                            </a>
+                        }
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+
+</div>

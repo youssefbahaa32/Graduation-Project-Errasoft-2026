@@ -6,10 +6,13 @@
 
         public string Name { get; set; } = null!;
 
-        public string Code { get; set; } = null!;
+        public string IATACode { get; set; } = null!;
 
+        public string ICAOCode { get; set; } = null!;
+    
         public string City { get; set; } = null!;
 
         public string Country { get; set; } = null!;
+        public List<AirportImageVM> Images { get; set; } = [];
     }
 }

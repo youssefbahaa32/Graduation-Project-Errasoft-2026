@@ -19,5 +19,7 @@
         public decimal BasePrice { get; set; }
 
         public FlightStatus Status { get; set; }
+        public string? ImageUrl { get; set; }
+
     }
 }

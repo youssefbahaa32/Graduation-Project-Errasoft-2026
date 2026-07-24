@@ -20,5 +20,6 @@ namespace AirlineReservationSystem.ViewModels.Flight
         public decimal BasePrice { get; set; }
 
         public FlightStatus Status { get; set; }
+        public List<FlightImageVM> Images { get; set; } = [];
     }
 }

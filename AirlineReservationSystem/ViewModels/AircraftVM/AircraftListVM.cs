@@ -13,5 +13,6 @@
         public int Capacity { get; set; }
 
         public AircraftStatus Status { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

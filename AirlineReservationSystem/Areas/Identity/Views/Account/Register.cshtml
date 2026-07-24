@@ -1,0 +1,438 @@
+﻿@model RegisterVM
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+@section Styles {  
+    <style>
+        :root {
+            --sky-blue: #0d6efd;
+            --sky-blue-dark: #0a58ca;
+            --sky-navy: #0b2447;
+        }
+
+        .reg-page {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0b2447 0%, #164a7a 35%, #3d7cb8 65%, #bcd9ef 100%);
+            padding: 50px 15px;
+        }
+
+        .reg-cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0.7;
+        }
+
+            .reg-cloud::before, .reg-cloud::after {
+                content: "";
+                position: absolute;
+                background: inherit;
+                border-radius: 50%;
+            }
+
+        .cloud1 {
+            width: 150px;
+            height: 48px;
+            top: 6%;
+            left: 6%;
+            animation: floatX 34s linear infinite;
+        }
+
+            .cloud1::before {
+                width: 75px;
+                height: 75px;
+                top: -37px;
+                left: 16px;
+            }
+
+            .cloud1::after {
+                width: 58px;
+                height: 58px;
+                top: -26px;
+                left: 74px;
+            }
+
+        .cloud2 {
+            width: 110px;
+            height: 36px;
+            top: 14%;
+            right: 8%;
+            animation: floatX 44s linear infinite reverse;
+        }
+
+            .cloud2::before {
+                width: 58px;
+                height: 58px;
+                top: -29px;
+                left: 10px;
+            }
+
+            .cloud2::after {
+                width: 42px;
+                height: 42px;
+                top: -19px;
+                left: 58px;
+            }
+
+        .cloud3 {
+            width: 160px;
+            height: 50px;
+            top: 82%;
+            left: 4%;
+            opacity: 0.28;
+            animation: floatX 52s linear infinite;
+        }
+
+            .cloud3::before {
+                width: 80px;
+                height: 80px;
+                top: -40px;
+                left: 20px;
+            }
+
+            .cloud3::after {
+                width: 60px;
+                height: 60px;
+                top: -28px;
+                left: 85px;
+            }
+
+        .cloud4 {
+            width: 120px;
+            height: 40px;
+            top: 88%;
+            right: 6%;
+            opacity: 0.25;
+            animation: floatX 46s linear infinite reverse;
+        }
+
+            .cloud4::before {
+                width: 60px;
+                height: 60px;
+                top: -30px;
+                left: 10px;
+            }
+
+            .cloud4::after {
+                width: 45px;
+                height: 45px;
+                top: -20px;
+                left: 65px;
+            }
+
+        @@keyframes floatX {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(40px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .reg-dots {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px);
+            background-size: 26px 26px;
+            opacity: 0.5;
+        }
+
+        .reg-plane {
+            position: absolute;
+            top: 40%;
+            left: -10%;
+            font-size: 2.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            animation: flyAcross 24s linear infinite;
+            z-index: 1;
+        }
+
+        @@keyframes flyAcross {
+            0% {
+                left: -10%;
+                top: 50%;
+                transform: rotate(8deg);
+            }
+
+            50% {
+                left: 55%;
+                top: 10%;
+                transform: rotate(8deg);
+            }
+
+            100% {
+                left: 115%;
+                top: 2%;
+                transform: rotate(8deg);
+            }
+        }
+
+        .reg-card {
+            position: relative;
+            z-index: 2;
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            border-radius: 22px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .reg-header {
+            background: linear-gradient(120deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+            color: #fff;
+            text-align: center;
+            padding: 40px 30px 34px;
+            position: relative;
+        }
+
+        .reg-header-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 1.9rem;
+            transform: rotate(45deg);
+        }
+
+        .reg-header h1 {
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+            font-size: 1.8rem;
+        }
+
+        .reg-header p {
+            opacity: 0.9;
+            font-size: 0.97rem;
+            margin-bottom: 0;
+        }
+
+        .reg-ticket-strip {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 14px;
+            background-image: radial-gradient(circle at 10px 0, transparent 8px, var(--sky-blue-dark) 8px);
+            background-size: 20px 16px;
+            background-position: 0 -8px;
+        }
+
+        .reg-body {
+            padding: 45px 45px 20px;
+        }
+
+        .reg-label {
+            font-weight: 600;
+            color: #0b2447;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .reg-input-group {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+            .reg-input-group .reg-icon {
+                position: absolute;
+                top: 42px;
+                left: 14px;
+                color: #9aa7b5;
+                font-size: 1rem;
+                z-index: 3;
+            }
+
+            .reg-input-group input.form-control {
+                padding: 12px 14px 12px 40px;
+                border-radius: 12px;
+                border: 1.5px solid #dfe6ec;
+                font-size: 0.98rem;
+                transition: all 0.25s ease;
+                background: #f8fafc;
+            }
+
+                .reg-input-group input.form-control:focus {
+                    border-color: var(--sky-blue);
+                    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+                    background: #fff;
+                }
+
+        .reg-section-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #9aa7b5;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e3e9ef;
+        }
+
+        .reg-submit-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+            background: linear-gradient(120deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+            box-shadow: 0 10px 22px rgba(13, 110, 253, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .reg-submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 28px rgba(13, 110, 253, 0.4);
+            }
+
+        .reg-footer {
+            text-align: center;
+            padding: 20px;
+            background: #f4f7fa;
+            border-top: 1px dashed #dbe3ea;
+            color: #6d7b89;
+            font-size: 0.92rem;
+        }
+
+            .reg-footer a {
+                color: var(--sky-blue-dark);
+                font-weight: 700;
+                text-decoration: none;
+            }
+
+                .reg-footer a:hover {
+                    color: var(--sky-blue);
+                }
+
+        @@media (max-width: 576px) {
+            .reg-body {
+                padding: 32px 22px 10px;
+            }
+
+            .reg-header {
+                padding: 32px 20px 28px;
+            }
+        }
+    </style>
+}
+
+<div class="reg-page">
+    <div class="reg-dots"></div>
+    <div class="reg-cloud cloud1"></div>
+    <div class="reg-cloud cloud2"></div>
+    <div class="reg-cloud cloud3"></div>
+    <div class="reg-cloud cloud4"></div>
+    <i class="fa-solid fa-plane reg-plane"></i>
+
+    <div class="reg-card">
+        <!-- Header -->
+        <div class="reg-header">
+            <div class="reg-header-icon">
+                <i class="fa-solid fa-plane" style="transform: rotate(-45deg);"></i>
+            </div>
+            <h1>Create Account</h1>
+            <p>Join us and enjoy unforgettable flights</p>
+            <div class="reg-ticket-strip"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="reg-body">
+            <form asp-action="Register">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="reg-section-title">Personal Information</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="reg-input-group">
+                            <label asp-for="FirstName" class="reg-label"></label>
+                            <i class="fa-regular fa-user reg-icon"></i>
+                            <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="reg-input-group">
+                            <label asp-for="LastName" class="reg-label"></label>
+                            <i class="fa-regular fa-user reg-icon"></i>
+                            <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg-section-title">Account Information</div>
+                <div class="reg-input-group">
+                    <label asp-for="UserName" class="reg-label"></label>
+                    <i class="fa-regular fa-id-badge reg-icon"></i>
+                    <input asp-for="UserName" class="form-control" placeholder="Choose a username" />
+                    <span asp-validation-for="UserName" class="text-danger small"></span>
+                </div>
+
+                <div class="reg-input-group">
+                    <label asp-for="Email" class="reg-label"></label>
+                    <i class="fa-regular fa-envelope reg-icon"></i>
+                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="reg-section-title">Security</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="reg-input-group">
+                            <label asp-for="Password" class="reg-label"></label>
+                            <i class="fa-solid fa-lock reg-icon"></i>
+                            <input asp-for="Password" class="form-control" placeholder="Create password" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="reg-input-group">
+                            <label asp-for="ConfirmPassword" class="reg-label"></label>
+                            <i class="fa-solid fa-lock reg-icon"></i>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-3 mb-2">
+                    <input type="submit" value="Create Account" class="btn btn-primary btn-lg reg-submit-btn text-white" />
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="reg-footer">
+            <span>Already have an account?</span>
+            <a asp-action="Login">Login</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

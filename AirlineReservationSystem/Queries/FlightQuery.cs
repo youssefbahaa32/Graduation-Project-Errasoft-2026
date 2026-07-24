@@ -9,7 +9,7 @@
             public FlightQuery(FlightIndexVM vm)
             {
                 AsNoTracking = true;
-
+            Include = q => q.Include(a => a.Images);
                 Include = q => q
                     .Include(f => f.Aircraft)
                     .Include(f => f.DepartureAirport)

@@ -1,0 +1,169 @@
+﻿@model AirlineReservationSystem.ViewModels.BookingVM.BookingDetailsVM
+
+@{
+    ViewData["Title"] = "Booking Details - " + Model.BookingReference;
+}
+
+<div class="container-fluid mt-4">
+    <!-- Header & Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <i class="fas fa-info-circle text-info"></i> Booking Details: <span class="text-primary">@Model.BookingReference</span>
+        </h2>
+        <div>
+            @if (Model.Status != BookingStatus.Cancelled)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning text-white">
+                    <i class="fas fa-edit"></i> Change Status
+                </a>
+                <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Are you sure you want to cancel this booking?');" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times-circle"></i> Cancel Booking
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. معلومات العميل والرحلة -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0"><i class="fas fa-user-tie text-secondary"></i> Customer & Flight Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td class="fw-bold text-muted" style="width: 35%;">Customer Name:</td>
+                            <td>@Model.CustomerName</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">Customer Email:</td>
+                            <td><a href="mailto:@Model.CustomerEmail">@Model.CustomerEmail</a></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">Flight Number:</td>
+                            <td><span class="badge bg-secondary fs-6">@Model.FlightNumber</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">Booking Status:</td>
+                            <td>
+                                <span class="badge @(Model.Status == AirlineReservationSystem.Models.Enums.BookingStatus.Cancelled ? "bg-danger" : Model.Status == AirlineReservationSystem.Models.Enums.BookingStatus.Confirmed ? "bg-success" : "bg-warning") fs-6">
+                                    @Model.Status
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">Created At:</td>
+                            <td>@Model.CreatedAt.ToString("F")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. تفاصيل الدفع والمالية -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0"><i class="fas fa-credit-card text-secondary"></i> Payment Details</h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <table class="table table-borderless mb-3">
+                        <tr>
+                            <td class="fw-bold text-muted" style="width: 40%;">Total Amount:</td>
+                            <td class="fs-5 text-success fw-bold">@Model.TotalAmount.ToString("C")</td>
+                        </tr>
+                        @if (Model.Payment != null)
+                        {
+                            <tr>
+                                <td class="fw-bold text-muted">Payment Method:</td>
+                                <td>@Model.Payment.PaymentMethod</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">Transaction Ref:</td>
+                                <td><code class="text-dark">@Model.Payment.TransactionReference</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">Payment Status:</td>
+                                <td>
+                                    <span class="badge @(Model.Payment.Status == AirlineReservationSystem.Models.Enums.PaymentStatus.Paid ? "bg-success" : Model.Payment.Status == AirlineReservationSystem.Models.Enums.PaymentStatus.Failed ? "bg-danger" : "bg-warning") fs-6">
+                                        @Model.Payment.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center py-4 text-muted">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block text-warning"></i> No payment records found for this booking.
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. قائمة المسافرين -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-users"></i> Manifest / Passengers List (@Model.Passengers.Count())</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Passport Number</th>
+                                    <th>Seat Number</th>
+                                    <th>Seat Class</th>
+                                    <th>Ticket Number</th>
+                                    <th class="text-center">Baggage Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int index = 1;
+                                }
+                                @foreach (var passenger in Model.Passengers)
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td class="fw-bold">@passenger.FullName</td>
+                                        <td><span class="text-monospace">@passenger.PassportNumber</span></td>
+                                        <td><span class="badge bg-info text-dark">@passenger.SeatNumber</span></td>
+                                        <td>@passenger.SeatClass</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(passenger.TicketNumber))
+                                            {
+                                                <small class="badge bg-light text-dark border">@passenger.TicketNumber</small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted italic small">Not Issued</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary rounded-pill">@passenger.BaggagesCount Bags</span>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

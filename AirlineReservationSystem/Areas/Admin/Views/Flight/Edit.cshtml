@@ -1,0 +1,233 @@
+﻿@model FlightUpdateVM
+
+@{
+    ViewData["Title"] = "Edit Flight";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-edit me-2"></i>
+            Edit Flight
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Flight Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="FlightNumber" class="form-label"></label>
+                        <input asp-for="FlightNumber" class="form-control" />
+                        <span asp-validation-for="FlightNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="AircraftId" class="form-label"></label>
+                        <select asp-for="AircraftId"
+                                asp-items="Model.Aircrafts"
+                                class="form-select">
+                            <option value="">-- Select Aircraft --</option>
+                        </select>
+                        <span asp-validation-for="AircraftId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureAirportId" class="form-label"></label>
+                        <select asp-for="DepartureAirportId"
+                                asp-items="Model.DepartureAirports"
+                                class="form-select">
+                            <option value="">-- Select Departure Airport --</option>
+                        </select>
+                        <span asp-validation-for="DepartureAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalAirportId" class="form-label"></label>
+                        <select asp-for="ArrivalAirportId"
+                                asp-items="Model.ArrivalAirports"
+                                class="form-select">
+                            <option value="">-- Select Arrival Airport --</option>
+                        </select>
+                        <span asp-validation-for="ArrivalAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureTime" class="form-label"></label>
+                        <input asp-for="DepartureTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalTime" class="form-label"></label>
+                        <input asp-for="ArrivalTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="ArrivalTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="BasePrice" class="form-label"></label>
+                        <input asp-for="BasePrice"
+                               class="form-control" />
+                        <span asp-validation-for="BasePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label"></label>
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<FlightStatus>()"
+                                class="form-select">
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                    <hr />
+
+                    <h5 class="mb-3">
+                        Current Images
+                    </h5>
+
+                    <div class="row">
+
+                        @if (Model.ExistingImages.Any())
+                        {
+                            @foreach (var image in Model.ExistingImages)
+                            {
+                                <div class="col-md-3 mb-3 text-center">
+
+                                    <img src="~/@image.Url"
+                                         class="img-thumbnail"
+                                         style="height:150px;width:100%;object-fit:cover;" />
+
+                                    <div class="form-check mt-2">
+
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="ImagesToDelete"
+                                               value="@image.Id" />
+
+                                        <label class="form-check-label">
+                                            Delete
+                                        </label>
+
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    No images found.
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <div class="mb-3">
+
+                            <label asp-for="Images" class="form-label">
+                                Add New Images
+                            </label>
+
+                            <input asp-for="Images"
+                                   class="form-control"
+                                   type="file"
+                                   multiple
+                                   accept="image/*" />
+
+                            <span asp-validation-for="Images"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div id="preview" class="row"></div>
+
+                    </div>
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i>
+                        Update Flight
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const input = document.querySelector('input[type=file]');
+        const preview = document.getElementById('preview');
+
+        input.addEventListener('change', function () {
+
+            preview.innerHTML = '';
+
+            [...this.files].forEach(file => {
+
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    preview.innerHTML += `
+                        <div class="col-md-3 mb-3">
+
+                            <img src="${e.target.result}"
+                                 class="img-thumbnail"
+                                 style="height:150px;width:100%;object-fit:cover;" />
+
+                        </div>`;
+                };
+
+                reader.readAsDataURL(file);
+
+            });
+
+        });
+
+    </script>
+}

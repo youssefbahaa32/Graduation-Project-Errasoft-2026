@@ -1,0 +1,153 @@
+﻿@model TicketDetailsVm
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mt-2">
+            <i class="fas fa-ticket-alt me-2"></i>Ticket Details
+        </h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Tickets</a></li>
+        <li class="breadcrumb-item active">@Model.TicketNumber</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-info-circle me-1"></i> Ticket Information</span>
+            @{
+                var badgeClass = Model.Status.ToString() switch
+                {
+                    "Issued" => "bg-info",
+                    "Boarded" => "bg-success",
+                    "Cancelled" => "bg-danger",
+                    _ => "bg-light text-dark"
+                };
+            }
+            <span class="badge @badgeClass fs-6">@Model.Status</span>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Ticket Number</dt>
+                <dd class="col-sm-9">@Model.TicketNumber</dd>
+
+                <dt class="col-sm-3">Barcode</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-light text-dark border">@Model.Barcode</span>
+                </dd>
+
+                <dt class="col-sm-3">Fare</dt>
+                <dd class="col-sm-9">@Model.Fare.ToString("N2")</dd>
+
+                <dt class="col-sm-3">Issued At</dt>
+                <dd class="col-sm-9">@Model.IssuedAt.ToString("dd MMM yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Passenger</dt>
+                <dd class="col-sm-9">@Model.PassengerFullName</dd>
+
+                <dt class="col-sm-3">Passport Number</dt>
+                <dd class="col-sm-9">@Model.PassportNumber</dd>
+
+                <dt class="col-sm-3">Booking Reference</dt>
+                <dd class="col-sm-9">@Model.BookingReference</dd>
+
+                <dt class="col-sm-3">Flight</dt>
+                <dd class="col-sm-9">@Model.FlightNumber</dd>
+
+                <dt class="col-sm-3">Seat</dt>
+                <dd class="col-sm-9">@Model.SeatNumber</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            @if (Model.Status == TicketStatus.Issued)
+            {
+                <button type="button" class="btn btn-danger btn-cancel"
+                        data-id="@Model.Id" data-name="@Model.TicketNumber">
+                    <i class="fas fa-ban me-1"></i> Cancel Ticket
+                </button>
+            }
+            else if (Model.Status == TicketStatus.Cancelled)
+            {
+                <button type="button" class="btn btn-success btn-reinstate"
+                        data-id="@Model.Id" data-name="@Model.TicketNumber">
+                    <i class="fas fa-undo me-1"></i> Reinstate Ticket
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<form id="cancelForm" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+<form id="reinstateForm" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        @if (TempData["success-notification"] is not null)
+        {
+                    <text>toastr.success('@TempData["success-notification"]');</text>
+        }
+        @if (TempData["error-notification"] is not null)
+        {
+                    <text>toastr.error('@TempData["error-notification"]');</text>
+        }
+
+        document.querySelectorAll('.btn-cancel').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to cancel ticket "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, cancel it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('cancelForm');
+                        form.action = `/Admin/Tickets/${id}/Cancel`;
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-reinstate').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to reinstate ticket "${name}"?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, reinstate it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('reinstateForm');
+                        form.action = `/Admin/Tickets/${id}/Reinstate`;
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

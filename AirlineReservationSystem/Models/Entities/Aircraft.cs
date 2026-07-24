@@ -11,6 +11,7 @@ public class Aircraft : AuditableEntity // طائرة
     public int Capacity { get; set; } // السعة الإجمالية للركاب
 
     public AircraftStatus Status { get; set; } // حالة الطائرة الحالية (متاحة، صيانة، إلخ)
+    public ICollection<AircraftImage>? Images { get; set; } = new HashSet<AircraftImage>();
 
     // العلاقات (Navigation Properties)
     public ICollection<Seat> Seats { get; set; } = new HashSet<Seat>(); // مقاعد هذه الطائرة

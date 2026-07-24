@@ -1,0 +1,248 @@
+﻿@model AircraftUpdateVM
+
+@{
+    ViewData["Title"] = "Edit Aircraft";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mt-2">
+            <i class="fas fa-edit me-2"></i>
+            Edit Aircraft
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back to List
+        </a>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            <a href="/Admin">Dashboard</a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a asp-action="Index">Aircraft</a>
+        </li>
+
+        <li class="breadcrumb-item active">
+            Edit
+        </li>
+    </ol>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <i class="fas fa-plane me-1"></i>
+            Aircraft Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit"method="post"enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="RegistrationNumber"></label>
+
+                        <input asp-for="RegistrationNumber"
+                               class="form-control" />
+
+                        <span asp-validation-for="RegistrationNumber"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Manufacturer"></label>
+
+                        <input asp-for="Manufacturer"
+                               class="form-control" />
+
+                        <span asp-validation-for="Manufacturer"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Model"></label>
+
+                        <input asp-for="Model"
+                               class="form-control" />
+
+                        <span asp-validation-for="Model"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Capacity"></label>
+
+                        <input asp-for="Capacity"
+                               class="form-control"
+                               type="number" />
+
+                        <span asp-validation-for="Capacity"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Status"></label>
+
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<AircraftStatus>()"
+                                class="form-select">
+                        </select>
+
+                    </div>
+
+                    <hr />
+
+                    <h5 class="mb-3">
+                        Current Images
+                    </h5>
+
+                    <div class="row">
+
+                        @if (Model.ExistingImages.Any())
+                        {
+                            @foreach (var image in Model.ExistingImages)
+                            {
+                                <div class="col-md-3 mb-3 text-center">
+
+                                    <img src="~/@image.Url"
+                                         class="img-thumbnail"
+                                         style="height:150px;width:100%;object-fit:cover;" />
+
+                                    <div class="form-check mt-2">
+
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="ImagesToDelete"
+                                               value="@image.Id" />
+
+                                        <label class="form-check-label">
+                                            Delete
+                                        </label>
+
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    No images found.
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <div class="mb-3">
+
+                            <label asp-for="Images" class="form-label">
+                                Add New Images
+                            </label>
+
+                            <input asp-for="Images"
+                                   class="form-control"
+                                   type="file"
+                                   multiple
+                                   accept="image/*" />
+
+                            <span asp-validation-for="Images"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div id="preview" class="row"></div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="mt-4">
+
+                    <button class="btn btn-warning">
+
+                        <i class="fas fa-save me-1"></i>
+
+                        Update Aircraft
+
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const input = document.querySelector('input[type=file]');
+        const preview = document.getElementById('preview');
+
+        input.addEventListener('change', function () {
+
+            preview.innerHTML = '';
+
+            [...this.files].forEach(file => {
+
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    preview.innerHTML += `
+                        <div class="col-md-3 mb-3">
+
+                            <img src="${e.target.result}"
+                                 class="img-thumbnail"
+                                 style="height:150px;width:100%;object-fit:cover;" />
+
+                        </div>`;
+                };
+
+                reader.readAsDataURL(file);
+
+            });
+
+        });
+
+    </script>
+}

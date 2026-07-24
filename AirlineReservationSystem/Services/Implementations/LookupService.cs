@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using AirlineReservationSystem.Models.Entities;
+using AirlineReservationSystem.Queries;
+using AirlineReservationSystem.Repositories.Interfaces;
+using AirlineReservationSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
@@ -6,6 +10,7 @@ namespace AirlineReservationSystem.Services.Implementations
     {
         private readonly IAirportRepository _airportRepository;
         private readonly IAircraftRepository _aircraftRepository;
+
         public LookupService(
             IAirportRepository airportRepository,
             IAircraftRepository aircraftRepository)
@@ -13,25 +18,40 @@ namespace AirlineReservationSystem.Services.Implementations
             _airportRepository = airportRepository;
             _aircraftRepository = aircraftRepository;
         }
+
         public async Task<IEnumerable<SelectListItem>> GetAirportsAsync(
             CancellationToken cancellationToken = default)
         {
-            var airports = await _airportRepository.GetAllAsync(cancellationToken: cancellationToken);
+           
+            var airports = await _airportRepository.GetAllAsync(
+                expression: null,
+                includes: null,
+                tracked: false,
+                cancellationToken: cancellationToken);
+
+           
             return airports.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
                 Text = $"{a.IATACode} - {a.Name}"
-            });
+            }).ToList();
         }
+
         public async Task<IEnumerable<SelectListItem>> GetAircraftsAsync(
             CancellationToken cancellationToken = default)
         {
-            var aircrafts = await _aircraftRepository.GetAllAsync(cancellationToken: cancellationToken);
+          
+            var aircrafts = await _aircraftRepository.GetAllAsync(
+                expression: null,
+                includes: null,
+                tracked: false,
+                cancellationToken: cancellationToken);
+
             return aircrafts.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
-                Text = $"{a.Model} ({a.Manufacturer})"
-            });
+                Text = $"{a.RegistrationNumber} - {a.Model}"
+            }).ToList();
         }
     }
 }

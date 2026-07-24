@@ -1,0 +1,242 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using AirlineReservationSystem.ViewModels.FlightCustomerVM
+@model List<FlightSearchResultVm>
+
+@{
+    ViewData["Title"] = "Book Flight — PharaohWings";
+
+    var searchVm = ViewBag.SearchVm as FlightSearchVM;
+    var airports = ViewBag.Airports as List<SelectListItem>;
+    var passengerCount = (int)(ViewBag.PassengerCount ?? 1);
+
+    string AirportLabel(int? id)
+    {
+        if (id is null || airports is null) return "-";
+        var item = airports.FirstOrDefault(a => a.Value == id.ToString());
+        return item?.Text ?? "-";
+    }
+}
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <h1>Select Your Flight</h1>
+        <p id="bookingSubtitle">
+            @AirportLabel(searchVm?.DepartureAirportId) →
+            @AirportLabel(searchVm?.ArrivalAirportId) •
+            @passengerCount Passenger@(passengerCount > 1 ? "s" : "") •
+            @(searchVm?.DepartureDate.ToString("ddd, MMM d, yyyy") ?? "")
+        </p>
+    </div>
+</section>
+
+<div class="container" style="padding:2rem 0 4rem">
+    <!-- Quick Search Bar -->
+    <form class="quick-search" asp-area="Customer" asp-controller="Flight" asp-action="Search" method="get"
+          style="background:var(--white);padding:1.5rem;border-radius:var(--radius);box-shadow:var(--shadow-md);margin-bottom:2rem">
+        <div class="search-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem">
+
+            <div class="field">
+                <label>From</label>
+                <select name="DepartureAirportId" id="searchFrom">
+                    <option value="">-- Select --</option>
+                    @if (airports != null)
+                    {
+                        @foreach (var a in airports)
+                        {
+                            <option value="@a.Value" selected="@(a.Value == searchVm?.DepartureAirportId.ToString())">@a.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label>To</label>
+                <select name="ArrivalAirportId" id="searchTo">
+                    <option value="">-- Select --</option>
+                    @if (airports != null)
+                    {
+                        @foreach (var a in airports)
+                        {
+                            <option value="@a.Value" selected="@(a.Value == searchVm?.ArrivalAirportId.ToString())">@a.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Date</label>
+                <input type="date" name="DepartureDate" id="searchDate"
+                       value="@(searchVm?.DepartureDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="field">
+                <label>Passengers</label>
+                <select name="PassengerCount" id="searchPax">
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <option value="@i" selected="@(i == passengerCount)">@i</option>
+                    }
+                </select>
+            </div>
+
+            <div style="display:flex;align-items:end">
+                <button type="submit" class="btn btn-primary" style="width:100%">🔍 Search</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="results-layout">
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                <h3 style="margin:0">Available Flights <span id="flightCount" style="color:var(--muted);font-size:0.9rem;font-weight:400"> Guild (@(Model?.Count ?? 0))</span></h3>
+                <div style="display:flex;gap:0.5rem">
+                    <button class="btn btn-ghost" onclick="toggleView('list')" id="viewList" title="List View">☰</button>
+                    <button class="btn btn-ghost" onclick="toggleView('grid')" id="viewGrid" title="Grid View">▦</button>
+                </div>
+            </div>
+
+            @if (Model is null || !Model.Any())
+            {
+                <div id="flightResultsMessage" style="text-align:center;padding:3rem;color:var(--muted)">
+                    <div style="font-size:3rem;margin-bottom:1rem">✈</div>
+                    <p>No flights found. Try adjusting your search.</p>
+                </div>
+            }
+            else
+            {
+                <div class="flight-list" id="flightList">
+                    @foreach (var flight in Model)
+                    {
+                        var durationMinutes = (int)(flight.ArrivalTime - flight.DepartureTime).TotalMinutes;
+                        <div class="flight-card"
+                             data-price="@flight.BasePrice"
+                             data-duration="@durationMinutes"
+                             data-departure="@flight.DepartureTime.ToString("O")">
+                            <div class="flight-airline">
+                                <div class="flight-logo">𓆙</div>
+                                <div>
+                                    <strong>PharaohWings</strong>
+                                    <div style="color:var(--muted);font-size:0.85rem">@flight.FlightNumber</div>
+                                </div>
+                            </div>
+
+                            <div class="flight-route">
+                                <div class="flight-time">
+                                    <strong>@flight.DepartureTime.ToString("HH:mm")</strong>
+                                    <div style="font-size:0.8rem;color:var(--muted)">@flight.DepartureAirport</div>
+                                </div>
+                                <div class="flight-path">
+                                    <span style="font-size:0.8rem;color:var(--muted)">@durationMinutes min</span>
+                                    <div class="flight-line">✈</div>
+                                </div>
+                                <div class="flight-time">
+                                    <strong>@flight.ArrivalTime.ToString("HH:mm")</strong>
+                                    <div style="font-size:0.8rem;color:var(--muted)">@flight.ArrivalAirport</div>
+                                </div>
+                            </div>
+
+                            <div class="flight-price">
+                                <div class="price-num">@flight.BasePrice.ToString("0")</div>
+                                <div style="font-size:0.75rem;color:var(--muted)">EGP</div>
+                                <div style="font-size:0.75rem;color:var(--muted)">@flight.AvailableSeatsCount seats left</div>
+                                <a class="btn btn-primary"
+                                   asp-area="Customer" asp-controller="Flight" asp-action="SelectSeats"
+                                   asp-route-flightId="@flight.Id" asp-route-passengers="@passengerCount">
+                                    Select Seat →
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <aside>
+            <div class="sidebar-card">
+                <h3>✈ Filter Results</h3>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="filterSort" onchange="applyFilters()">
+                        <option value="price">Price (Low to High)</option>
+                        <option value="price-desc">Price (High to Low)</option>
+                        <option value="duration">Duration (Shortest)</option>
+                        <option value="departure">Departure Time</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Max Price: <span id="priceValue" style="color:var(--gold);font-weight:600">3000 EGP</span></label>
+                    <input type="range" id="filterPrice" min="500" max="3000" value="3000" step="100"
+                           oninput="document.getElementById('priceValue').textContent=this.value+' EGP';applyFilters()" style="width:100%">
+                </div>
+                <button class="btn btn-ghost" onclick="resetFilters()" style="width:100%;margin-top:1rem">Reset Filters</button>
+            </div>
+
+            <div class="sidebar-card" style="background:linear-gradient(135deg,var(--navy),var(--navy-2));color:var(--white)">
+                <h3 style="color:var(--gold)">💡 Travel Tip</h3>
+                <p style="font-size:0.9rem;opacity:0.9;margin:0">Book morning flights for the best views of Egypt's landmarks from above!</p>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>📋 Your Search</h3>
+                <div id="searchSummary" style="font-size:0.9rem;color:var(--slate)">
+                    <p><strong>From:</strong> @AirportLabel(searchVm?.DepartureAirportId)</p>
+                    <p><strong>To:</strong> @AirportLabel(searchVm?.ArrivalAirportId)</p>
+                    <p><strong>Date:</strong> @(searchVm?.DepartureDate.ToString("ddd, MMM d, yyyy") ?? "-")</p>
+                    <p><strong>Passengers:</strong> @passengerCount</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function applyFilters() {
+            const maxPrice = parseFloat(document.getElementById('filterPrice').value);
+            const sortBy = document.getElementById('filterSort').value;
+            const list = document.getElementById('flightList');
+            if (!list) return;
+
+            const cards = Array.from(list.querySelectorAll('.flight-card'));
+
+            cards.forEach(card => {
+                const price = parseFloat(card.dataset.price);
+                card.style.display = price <= maxPrice ? '' : 'none';
+            });
+
+            const visible = cards.filter(c => c.style.display !== 'none');
+            visible.sort((a, b) => {
+                switch (sortBy) {
+                    case 'price': return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                    case 'price-desc': return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                    case 'duration': return parseInt(a.dataset.duration) - parseInt(b.dataset.duration);
+                    case 'departure': return new Date(a.dataset.departure) - new Date(b.dataset.departure);
+                    default: return 0;
+                }
+            });
+            visible.forEach(card => list.appendChild(card));
+
+            const countEl = document.getElementById('flightCount');
+            if (countEl) countEl.textContent = `(${visible.length})`;
+        }
+
+        function resetFilters() {
+            document.getElementById('filterPrice').value = 3000;
+            document.getElementById('priceValue').textContent = '3000 EGP';
+            document.getElementById('filterSort').value = 'price';
+            applyFilters();
+        }
+
+        function toggleView(mode) {
+            const list = document.getElementById('flightList');
+            if (!list) return;
+            list.classList.toggle('grid-view', mode === 'grid');
+            document.getElementById('viewList')?.classList.toggle('active', mode === 'list');
+            document.getElementById('viewGrid')?.classList.toggle('active', mode === 'grid');
+        }
+
+        document.addEventListener('DOMContentLoaded', applyFilters);
+    </script>
+}

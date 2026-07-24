@@ -9,7 +9,7 @@ namespace AirlineReservationSystem.Queries
         public AirportQuery(AirportIndexVM vm)
         {
             AsNoTracking = true;
-
+            Include = q => q.Include(a => a.Images);
             Include = q => q
                 .Include(a => a.DepartureFlights)
                 .Include(a => a.ArrivalFlights);

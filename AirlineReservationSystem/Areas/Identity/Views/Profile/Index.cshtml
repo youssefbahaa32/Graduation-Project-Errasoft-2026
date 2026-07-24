@@ -1,0 +1,421 @@
+﻿@using AirlineReservationSystem.ViewModels.IdentityVM
+@model ProfileUserVM
+
+
+@section Styles {
+<style>
+    :root {
+        --sky-blue: #0d6efd;
+        --sky-blue-dark: #0a58ca;
+        --sky-navy: #0b2447;
+    }
+
+    .prf-page {
+        background: #eef2f7;
+        min-height: 100vh;
+        padding-bottom: 50px;
+    }
+
+    .prf-cover {
+        height: 190px;
+        border-radius: 0 0 28px 28px;
+        background: linear-gradient(120deg, #0b2447 0%, #164a7a 45%, #3d7cb8 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .prf-cover::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.12) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            opacity: 0.6;
+        }
+
+        .prf-cover i.prf-plane {
+            position: absolute;
+            top: 30%;
+            left: 8%;
+            font-size: 2rem;
+            color: rgba(255,255,255,0.35);
+            transform: rotate(8deg);
+        }
+
+    .prf-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    /* Row wrapper: cards sit cleanly below the cover, no overlap of the blue banner */
+    .prf-row {
+        margin-top: 24px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Sidebar */
+    .prf-side-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(11, 36, 71, 0.12);
+        overflow: visible;
+        height: 100%;
+        position: relative;
+    }
+
+    .prf-avatar-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: -78px;
+        margin-bottom: 8px;
+    }
+
+    .prf-avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: #eef2f7;
+        border: 5px solid #fff;
+        box-shadow: 0 8px 20px rgba(11, 36, 71, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .prf-avatar svg {
+            width: 100%;
+            height: 100%;
+        }
+
+    .prf-user-name {
+        text-align: center;
+        font-weight: 700;
+        color: var(--sky-navy);
+        margin-top: 14px;
+        margin-bottom: 2px;
+        font-size: 1.15rem;
+    }
+
+    .prf-user-email {
+        text-align: center;
+        color: #8a96a3;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 18px;
+    }
+
+    .prf-badge {
+        display: block;
+        text-align: center;
+        margin: 0 auto 20px;
+    }
+
+        .prf-badge span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 110, 253, 0.1);
+            color: var(--sky-blue-dark);
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 6px 14px;
+            border-radius: 30px;
+        }
+
+    .prf-about {
+        border-top: 1px dashed #e3e9ef;
+        padding: 20px 24px 26px;
+    }
+
+        .prf-about h5 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9aa7b5;
+            margin-bottom: 10px;
+        }
+
+        .prf-about p {
+            color: #5b6b7c;
+            font-size: 0.93rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+    /* Main content cards */
+    .prf-main {
+        margin-top: 0;
+    }
+
+    .prf-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(11, 36, 71, 0.08);
+        margin-bottom: 28px;
+        overflow: hidden;
+    }
+
+    .prf-card-header {
+        padding: 22px 30px;
+        border-bottom: 1px solid #eef1f5;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .prf-card-header .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(13, 110, 253, 0.1);
+            color: var(--sky-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+        }
+
+        .prf-card-header h6 {
+            margin: 0;
+            font-weight: 700;
+            color: var(--sky-navy);
+            font-size: 1.02rem;
+        }
+
+    .prf-card-body {
+        padding: 28px 30px 26px;
+    }
+
+    .prf-label {
+        font-weight: 600;
+        color: #4c5b6b;
+        font-size: 0.9rem;
+        margin-bottom: 7px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .prf-card-body .form-control {
+        border-radius: 10px;
+        border: 1.5px solid #e3e9ef;
+        padding: 11px 14px;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        font-size: 0.96rem;
+    }
+
+        .prf-card-body .form-control:focus {
+            border-color: var(--sky-blue);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        }
+
+    .prf-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .prf-btn-primary {
+        background: linear-gradient(120deg, var(--sky-blue), var(--sky-blue-dark));
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 9px 26px;
+        box-shadow: 0 8px 18px rgba(13, 110, 253, 0.28);
+        transition: transform 0.2s ease;
+    }
+
+        .prf-btn-primary:hover {
+            transform: translateY(-1px);
+        }
+
+    .prf-btn-secondary {
+        background: #eef1f5;
+        color: #5b6b7c;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 9px 22px;
+    }
+
+        .prf-btn-secondary:hover {
+            background: #e3e9ef;
+            color: #4c5b6b;
+        }
+
+    @@media (max-width: 991px) {
+        .prf-row {
+            margin-top: 20px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .prf-avatar-wrap {
+            margin-top: -60px;
+        }
+    }
+</style>
+}
+
+<div class="prf-page">
+    <div class="prf-cover">
+        <i class="fa-solid fa-plane prf-plane"></i>
+    </div>
+
+    <div class="prf-container">
+        <div class="row gutters prf-row">
+            <!-- Sidebar -->
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                <div class="card prf-side-card">
+                    <div class="card-body p-0">
+                        <div class="account-settings">
+                            <div class="user-profile">
+                                <div class="prf-avatar-wrap">
+                                    <div class="prf-avatar">
+                                        <!-- Generic unknown-user avatar (no external image dependency) -->
+                                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="50" cy="50" r="50" fill="#d9e2ec" />
+                                            <circle cx="50" cy="40" r="18" fill="#aebdcc" />
+                                            <path d="M50 62c-19 0-34 12-34 27v11h68V89c0-15-15-27-34-27z" fill="#aebdcc" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <h5 class="prf-user-name">"@Model.ApplicationUserVM.FirstName @Model.ApplicationUserVM.LastName"</h5>
+                                <h6 class="prf-user-email">@Model.ApplicationUserVM.Email</h6>
+                                <div class="prf-badge">
+                                    <span><i class="fa-solid fa-plane-departure"></i> Verified Traveler</span>
+                                </div>
+                            </div>
+                            <div class="about prf-about">
+                                <h5>About</h5>
+                                <p>I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div class="prf-main">
+
+                    <!-- فورم تعديل البيانات -->
+                    <form asp-action="Update" method="post">
+                        <div class="card prf-card">
+                            <div class="prf-card-header">
+                                <div class="icon-box"><i class="fa-solid fa-user-pen"></i></div>
+                                <h6>Personal Details</h6>
+                            </div>
+                            <div class="prf-card-body">
+                                <div class="row gutters">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">First Name</label>
+                                            <input type="text" class="form-control"
+                                                   name="ApplicationUserVM.FirstName"
+                                                   value="@Model.ApplicationUserVM.FirstName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">Last Name</label>
+                                            <input type="text" class="form-control"
+                                                   name="ApplicationUserVM.LastName"
+                                                   value="@Model.ApplicationUserVM.LastName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">Email</label>
+                                            <input type="email" class="form-control"
+                                                   name="ApplicationUserVM.Email"
+                                                   value="@Model.ApplicationUserVM.Email">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">Phone</label>
+                                            <input type="text" class="form-control"
+                                                   name="ApplicationUserVM.PhoneNumber"
+                                                   value="@Model.ApplicationUserVM.PhoneNumber">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="prf-actions">
+                                    <input type="reset" value="Cancel" class="btn prf-btn-secondary">
+                                    <input type="submit" value="Update" class="btn prf-btn-primary text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- فورم تغيير الباسورد -->
+                    <form asp-action="ChangeCurrentPassword" method="post">
+                        <div class="card prf-card">
+                            <div class="prf-card-header">
+                                <div class="icon-box"><i class="fa-solid fa-lock"></i></div>
+                                <h6>Change Password</h6>
+                            </div>
+                            <div class="prf-card-body">
+                                <div class="row gutters">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">Current password</label>
+                                            <input type="password" class="form-control"
+                                                   name="ChangeCurrentPasswordVM.CurrentPassword"
+                                                   value="@Model.ChangeCurrentPasswordVM.CurrentPassword">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">New password</label>
+                                            <input type="password" class="form-control"
+                                                   name="ChangeCurrentPasswordVM.NewPassword"
+                                                   value="@Model.ChangeCurrentPasswordVM.NewPassword">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label class="prf-label">Confirm password</label>
+                                            <input type="password" class="form-control"
+                                                   name="ChangeCurrentPasswordVM.ConfirmPassword"
+                                                   value="@Model.ChangeCurrentPasswordVM.ConfirmPassword">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="prf-actions">
+                                    <input type="reset" value="Cancel" class="btn prf-btn-secondary">
+                                    <input type="submit" value="Save" class="btn prf-btn-primary text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_NotificationPartial" />
+}
+
+
+
+           

@@ -1,0 +1,290 @@
+﻿@model TicketIndexVm
+
+@{
+    ViewData["Title"] = "Tickets";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mt-2">
+            <i class="fas fa-ticket-alt me-2"></i>Tickets
+        </h1>
+    </div>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Tickets</li>
+    </ol>
+
+    <!-- Search Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i> Search
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" name="search" value="@Model.Search"
+                           class="form-control" placeholder="Ticket number..." />
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="passengerName" value="@Model.PassengerName"
+                           class="form-control" placeholder="Passenger name..." />
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select" asp-items="Html.GetEnumSelectList<TicketStatus>()">
+                        <option value="">-- Status --</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Tickets List
+        </div>
+        <div class="card-body">
+            @if (!Model.Items.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted"></i>
+                    <p class="text-muted mt-3 mb-0">No tickets found.</p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover" id="ticketsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ticket Number</th>
+                            <th>Passenger</th>
+                            <th>Booking Ref</th>
+                            <th>Flight</th>
+                            <th>Seat</th>
+                            <th>Fare</th>
+                            <th>Status</th>
+                            <th>Issued At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model.Items)
+                        {
+                            <tr>
+                                <td>@ticket.Id</td>
+                                <td class="fw-semibold">@ticket.TicketNumber</td>
+                                <td>@ticket.PassengerFullName</td>
+                                <td>@ticket.BookingReference</td>
+                                <td>@ticket.FlightNumber</td>
+                                <td>@ticket.SeatNumber</td>
+                                <td>@ticket.Fare.ToString("N2")</td>
+                                <td>
+                                    @{
+                                        var badgeClass = ticket.Status.ToString() switch
+                                        {
+                                            "Issued" => "bg-info",
+                                            "Boarded" => "bg-success",
+                                            "Cancelled" => "bg-danger",
+                                            _ => "bg-light text-dark"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@ticket.Status</span>
+                                </td>
+                                <td>@ticket.IssuedAt.ToString("dd MMM yyyy HH:mm")</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@ticket.Id"
+                                           class="btn btn-outline-info" title="Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        @if (ticket.Status == TicketStatus.Issued)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-cancel"
+                                                    data-id="@ticket.Id"
+                                                    data-name="@ticket.TicketNumber"
+                                                    title="Cancel">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        }
+                                        else if (ticket.Status == TicketStatus.Cancelled)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-outline-success btn-reinstate"
+                                                    data-id="@ticket.Id"
+                                                    data-name="@ticket.TicketNumber"
+                                                    title="Reinstate">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.Items.Any())
+        {
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <small class="text-muted">
+                    Showing page @Model.Page of @Model.TotalPages
+                    (@Model.TotalCount total ticket@(Model.TotalCount == 1 ? "" : "s"))
+                </small>
+
+                <nav aria-label="Tickets pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-search="@Model.Search"
+                               asp-route-passengerName="@Model.PassengerName"
+                               asp-route-status="@Model.Status"
+                               asp-route-sortOrder="@Model.SortOrder">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.Page - 1)"
+                               asp-route-search="@Model.Search"
+                               asp-route-passengerName="@Model.PassengerName"
+                               asp-route-status="@Model.Status"
+                               asp-route-sortOrder="@Model.SortOrder">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+
+                        @{
+                            int startPage = Math.Max(1, Model.Page - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.Page + 2);
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-search="@Model.Search"
+                                   asp-route-passengerName="@Model.PassengerName"
+                                   asp-route-status="@Model.Status"
+                                   asp-route-sortOrder="@Model.SortOrder">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.Page + 1)"
+                               asp-route-search="@Model.Search"
+                               asp-route-passengerName="@Model.PassengerName"
+                               asp-route-status="@Model.Status"
+                               asp-route-sortOrder="@Model.SortOrder">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-search="@Model.Search"
+                               asp-route-passengerName="@Model.PassengerName"
+                               asp-route-status="@Model.Status"
+                               asp-route-sortOrder="@Model.SortOrder">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Hidden forms for Cancel / Reinstate -->
+<form id="cancelForm" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+<form id="reinstateForm" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        // Toastr messages from TempData
+        @if (TempData["success-notification"] is not null)
+        {
+                    <text>toastr.success('@TempData["success-notification"]');</text>
+        }
+        @if (TempData["error-notification"] is not null)
+        {
+                    <text>toastr.error('@TempData["error-notification"]');</text>
+        }
+
+        // SweetAlert2 - Cancel confirmation
+        document.querySelectorAll('.btn-cancel').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to cancel ticket "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, cancel it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('cancelForm');
+                        form.action = `/Admin/Tickets/${id}/Cancel`;
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // SweetAlert2 - Reinstate confirmation
+        document.querySelectorAll('.btn-reinstate').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to reinstate ticket "${name}"?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, reinstate it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('reinstateForm');
+                        form.action = `/Admin/Tickets/${id}/Reinstate`;
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

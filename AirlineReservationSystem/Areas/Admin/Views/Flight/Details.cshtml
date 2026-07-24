@@ -1,0 +1,93 @@
+﻿@model FlightListVM
+
+@{
+    ViewData["Title"] = "Flight Details";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-plane me-2"></i>
+            Flight Details
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Flight Information
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th width="250">Flight Number</th>
+                    <td>@Model.FlightNumber</td>
+                </tr>
+
+                <tr>
+                    <th>Aircraft</th>
+                    <td>@Model.Aircraft</td>
+                </tr>
+
+                <tr>
+                    <th>Departure Airport</th>
+                    <td>@Model.DepartureAirport</td>
+                </tr>
+
+                <tr>
+                    <th>Arrival Airport</th>
+                    <td>@Model.ArrivalAirport</td>
+                </tr>
+
+                <tr>
+                    <th>Departure Time</th>
+                    <td>@Model.DepartureTime</td>
+                </tr>
+
+                <tr>
+                    <th>Arrival Time</th>
+                    <td>@Model.ArrivalTime</td>
+                </tr>
+
+                <tr>
+                    <th>Base Price</th>
+                    <td>@Model.BasePrice.ToString("C")</td>
+                </tr>
+
+                <tr>
+                    <th>Status</th>
+                    <td>@Model.Status</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        <div class="card-footer">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-warning">
+                <i class="fas fa-edit me-1"></i>
+                Edit
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

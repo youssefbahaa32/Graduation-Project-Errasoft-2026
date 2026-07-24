@@ -14,5 +14,6 @@ namespace AirlineReservationSystem.ViewModels.Aircraft
         public int Capacity { get; set; }
 
         public AircraftStatus Status { get; set; }
+        public List<AircraftImageVM> Images { get; set; } = [];
     }
 }

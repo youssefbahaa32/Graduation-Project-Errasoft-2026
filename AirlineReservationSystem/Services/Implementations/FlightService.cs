@@ -6,6 +6,7 @@ using AirlineReservationSystem.ViewModels.Flight;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
@@ -14,6 +15,8 @@ namespace AirlineReservationSystem.Services.Implementations
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportRepository _airportRepository;
         private readonly IAircraftRepository _aircraftRepository;
+        private readonly IFlightImageRepository _imageRepository;
+        private readonly IFileService _fileService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILookupService _lookupService;
@@ -22,6 +25,8 @@ namespace AirlineReservationSystem.Services.Implementations
             IFlightRepository flightRepository,
             IAirportRepository airportRepository,
             IAircraftRepository aircraftRepository,
+            IFlightImageRepository imageRepository,
+            IFileService fileService,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILookupService lookupService)
@@ -29,6 +34,8 @@ namespace AirlineReservationSystem.Services.Implementations
             _flightRepository = flightRepository;
             _airportRepository = airportRepository;
             _aircraftRepository = aircraftRepository;
+            _imageRepository = imageRepository;
+            _fileService = fileService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _lookupService = lookupService;
@@ -126,7 +133,6 @@ namespace AirlineReservationSystem.Services.Implementations
         }
 
         #endregion
-
         #region Create
 
         public async Task CreateAsync(
@@ -135,11 +141,67 @@ namespace AirlineReservationSystem.Services.Implementations
         {
             var flight = _mapper.Map<Flight>(vm);
 
-            await _flightRepository.AddAsync(
-                flight,
-                cancellationToken);
+        
+            List<FileUploadResult> uploadedImages = [];
+            if (vm.Images != null && vm.Images.Any())
+            {
+                uploadedImages = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Flights",
+                    cancellationToken);
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                foreach (var image in uploadedImages)
+                {
+                    flight.Images!.Add(new FlightImage
+                    {
+                        ImageUrl = image.RelativePath,
+                        FileName = image.FileName,
+                        ContentType = image.ContentType
+                    });
+                }
+            }
+
+            try
+            {
+                // الكراسي الثابتة الخاصة بالطائرة المختارة للرحلة دي
+                var staticSeats = await _unitOfWork.Seats.GetAllAsync(
+                    expression: s => s.AircraftId == flight.AircraftId,
+                    tracked: false,
+                    cancellationToken: cancellationToken);
+
+             
+                decimal routeBasePrice = flight.BasePrice; ;
+
+                // تحويل الكراسي الثابتة وتعبئتها مباشرة داخل الرحلة
+                flight.FlightSeats = staticSeats.Select(ss =>
+                {
+                    // تحديد الـ Multiplier بناءً على درجة الكرسي
+                    decimal classMultiplier = ss.SeatClass == SeatClass.Business ? 2.2m : 1.0m;
+                    decimal finalSeatPrice = routeBasePrice * classMultiplier;
+
+                    return new FlightSeat
+                    {
+                        SeatId = ss.Id,
+                        Price = finalSeatPrice,
+                        Status = FlightSeatStatus.Available
+                    };
+                }).ToList();
+
+                await _flightRepository.AddAsync(
+                    flight,
+                    cancellationToken);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                foreach (var file in uploadedImages)
+                {
+                    _fileService.Delete(file.RelativePath);
+                }
+
+                throw;
+            }
         }
 
         #endregion
@@ -157,6 +219,39 @@ namespace AirlineReservationSystem.Services.Implementations
             if (flight == null)
                 return false;
 
+            if (vm.ImagesToDelete != null && vm.ImagesToDelete.Any())
+            {
+                var imagesToDelete = flight.Images
+                    .Where(i => vm.ImagesToDelete.Contains(i.Id))
+                    .ToList();
+
+                foreach (var image in imagesToDelete)
+                {
+                    // حذف الملف من wwwroot
+                    _fileService.Delete(image.ImageUrl);
+
+                    // حذف السجل من قاعدة البيانات
+                    _imageRepository.Delete(image);
+                }
+            }
+            // إضافة صور جديدة
+            if (vm.Images != null && vm.Images.Any())
+            {
+                var uploadedFiles = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Flights",
+                    cancellationToken);
+
+                foreach (var file in uploadedFiles)
+                {
+                    flight.Images.Add(new FlightImage
+                    {
+                        ImageUrl = file.RelativePath,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType
+                    });
+                }
+            }
             _mapper.Map(vm, flight);
 
             _flightRepository.Update(flight);
@@ -174,13 +269,21 @@ namespace AirlineReservationSystem.Services.Implementations
             int id,
             CancellationToken cancellationToken = default)
         {
+          
+            var query = new BaseQuery<Flight>
+            {
+                Include = q => q.Include(f => f.FlightSeats)
+            };
+
             var flight = await _flightRepository.GetByIdAsync(
                 id,
-                cancellationToken: cancellationToken);
+                query, 
+                cancellationToken);
 
             if (flight == null)
                 return false;
 
+           
             _flightRepository.Delete(flight);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -196,47 +299,38 @@ namespace AirlineReservationSystem.Services.Implementations
             FlightIndexVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(
-                new BaseQuery<Airport>(),
-                cancellationToken);
+            var airports = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            var aircrafts = await _aircraftRepository.GetAllAsync(
-                new BaseQuery<Aircraft>(),
-                cancellationToken);
-
-            vm.Airports = airports.Select(a => new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = $"{a.IATACode} - {a.Name}"
-            });
-
-            vm.Aircrafts = aircrafts.Select(a => new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = $"{a.RegistrationNumber} - {a.Model}"
-            });
+            vm.Airports = airports;
+            vm.Aircrafts = aircrafts;
         }
 
         private async Task LoadDropDowns(
             FlightCreateVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(new BaseQuery<Airport>(), cancellationToken);
-            var aircrafts = await _aircraftRepository.GetAllAsync(new BaseQuery<Aircraft>(), cancellationToken);
+      
+            var airportsList = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircraftsList = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            vm.Airports = await _lookupService.GetAirportsAsync(cancellationToken);
-            vm.Aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
+            vm.Airports = airportsList;
+            vm.Aircrafts = aircraftsList;
+
+            // إذا كان الـ ViewModel يحتوي على الخواص القديمة، نؤمنها هنا أيضاً:
+            // vm.DepartureAirports = airportsList;
+            // vm.ArrivalAirports = airportsList;
         }
 
         private async Task LoadDropDowns(
             FlightUpdateVM vm,
             CancellationToken cancellationToken)
         {
-            var airports = await _airportRepository.GetAllAsync(new BaseQuery<Airport>(), cancellationToken);
-            var aircrafts = await _aircraftRepository.GetAllAsync(new BaseQuery<Aircraft>(), cancellationToken);
+            var airportsList = await _lookupService.GetAirportsAsync(cancellationToken);
+            var aircraftsList = await _lookupService.GetAircraftsAsync(cancellationToken);
 
-            vm.Airports = await _lookupService.GetAirportsAsync(cancellationToken);
-            vm.Aircrafts = await _lookupService.GetAircraftsAsync(cancellationToken);
+            vm.Airports = airportsList;
+            vm.Aircrafts = aircraftsList;
         }
 
         #endregion

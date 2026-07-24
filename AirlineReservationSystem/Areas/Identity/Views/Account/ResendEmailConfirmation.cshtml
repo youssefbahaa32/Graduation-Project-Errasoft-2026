@@ -1,0 +1,247 @@
+﻿@model ResendEmailConfirmationVM
+@{
+    ViewData["Title"] = "Resend Email Confirmation";
+}
+
+@section Styles {
+<style>
+    .rec-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        padding: 40px 15px;
+        background: linear-gradient(180deg, #0b1e3d 0%, #14345e 35%, #1c5b8e 70%, #2f86b5 100%);
+    }
+
+        /* Sky glow */
+        .rec-page::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.10) 0%, transparent 40%), radial-gradient(circle at 80% 10%, rgba(255,255,255,0.08) 0%, transparent 35%), radial-gradient(circle at 60% 80%, rgba(255,255,255,0.06) 0%, transparent 45%);
+            pointer-events: none;
+        }
+
+    /* Cloud shapes */
+    .cloud {
+        position: absolute;
+        background: rgba(255,255,255,0.10);
+        border-radius: 50%;
+        filter: blur(1px);
+        animation: float 18s ease-in-out infinite;
+    }
+
+    .cloud1 {
+        width: 180px;
+        height: 60px;
+        top: 12%;
+        left: 8%;
+        animation-delay: 0s;
+    }
+
+    .cloud2 {
+        width: 240px;
+        height: 80px;
+        top: 70%;
+        right: 6%;
+        animation-delay: 4s;
+    }
+
+    .cloud3 {
+        width: 140px;
+        height: 50px;
+        top: 45%;
+        left: 78%;
+        animation-delay: 8s;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateX(0) translateY(0);
+        }
+
+        50% {
+            transform: translateX(25px) translateY(-15px);
+        }
+    }
+
+    /* Flight path dotted line with a plane icon */
+    .flight-path {
+        position: absolute;
+        top: 18%;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        opacity: 0.35;
+    }
+
+        .flight-path svg {
+            width: 100%;
+            height: 100%;
+        }
+
+    .rec-card {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 460px;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 22px;
+        padding: 45px 40px 35px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.4) inset;
+        backdrop-filter: blur(6px);
+        animation: rise 0.6s ease;
+    }
+
+    @@keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .rec-icon {
+        width: 74px;
+        height: 74px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1c5b8e, #2f86b5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(28, 91, 142, 0.4);
+    }
+
+        .rec-icon svg {
+            width: 34px;
+            height: 34px;
+            fill: #fff;
+        }
+
+    .rec-title {
+        font-weight: 800;
+        color: #0b1e3d;
+        letter-spacing: -0.5px;
+    }
+
+    .rec-subtitle {
+        color: #6b7a90;
+        font-size: 0.95rem;
+    }
+
+    .rec-input {
+        border: 1.5px solid #e2e8f0;
+        padding: 12px 20px;
+        transition: all 0.25s ease;
+        font-size: 0.95rem;
+        background-color: #f8fafc;
+    }
+
+        .rec-input:focus {
+            border-color: #2f86b5;
+            box-shadow: 0 0 0 4px rgba(47, 134, 181, 0.15);
+            background-color: #fff;
+        }
+
+    .rec-label {
+        color: #26364d;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    .rec-btn {
+        background: linear-gradient(135deg, #1c5b8e, #2f86b5);
+        border: none;
+        padding: 13px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        box-shadow: 0 12px 25px rgba(28, 91, 142, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .rec-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(28, 91, 142, 0.45);
+        }
+
+    .rec-back-link {
+        color: #1c5b8e;
+        font-size: 0.9rem;
+    }
+
+        .rec-back-link:hover {
+            color: #123a5c;
+        }
+
+    .rec-divider {
+        border-top: 1px dashed #e2e8f0;
+        margin: 24px 0 18px;
+    }
+</style>
+}
+
+<div class="rec-page">
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="cloud cloud3"></div>
+
+    <div class="flight-path">
+        <svg viewBox="0 0 100 2" preserveAspectRatio="none">
+            <line x1="0" y1="1" x2="100" y2="1" stroke="white" stroke-width="0.3" stroke-dasharray="2,2" />
+        </svg>
+    </div>
+
+    <div class="rec-card">
+        <div class="text-center">
+            <div class="rec-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.5 19h19v2h-19v-2zm19.57-9.36c-.21-.8-1.04-1.28-1.84-1.06L14.92 10l-6.9-6.43-1.93.51 4.14 7.17-4.97 1.33-1.97-1.54-1.45.39 1.82 3.16.77 1.34 1.6-.43 5.31-1.42 4.6-1.23 4.34-1.16c.81-.23 1.28-1.05 1.06-1.85z" />
+                </svg>
+            </div>
+            <h2 class="rec-title mb-1">Resend Confirmation</h2>
+            <p class="rec-subtitle mb-0">Enter your email or username and we'll send your confirmation link right away</p>
+        </div>
+
+        <div class="rec-divider"></div>
+
+        <form asp-action="ResendEmailConfirmation">
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3 small"></div>
+
+            <div class="form-group mb-4">
+                <label asp-for="EmailOrUserName" class="rec-label fw-semibold d-block"></label>
+                <input asp-for="EmailOrUserName"
+                       class="form-control form-control-lg rounded-pill rec-input"
+                       placeholder="Email or username" />
+                <span asp-validation-for="EmailOrUserName" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-lg rounded-pill rec-btn text-white">
+                    Send Confirmation
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-4">
+            <a asp-action="Login" class="text-decoration-none fw-semibold rec-back-link">
+                &larr; Back to Login
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <partial name="_NotificationPartial" />
+}
+

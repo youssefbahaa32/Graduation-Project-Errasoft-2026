@@ -5,21 +5,28 @@ using AirlineReservationSystem.Services.Interfaces;
 using AirlineReservationSystem.ViewModels.Aircraft;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace AirlineReservationSystem.Services.Implementations
 {
     public class AircraftService : IAircraftService
     {
         private readonly IAircraftRepository _aircraftRepository;
+        private readonly IAircraftImageRepository _imageRepository;
+        private readonly IFileService _fileService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public AircraftService(
             IAircraftRepository aircraftRepository,
+            IAircraftImageRepository imageRepository,
+            IFileService fileService,
             IUnitOfWork unitOfWork,
             IMapper mapper)
         {
             _aircraftRepository = aircraftRepository;
+            _imageRepository = imageRepository;
+            _fileService = fileService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
@@ -31,7 +38,7 @@ namespace AirlineReservationSystem.Services.Implementations
             CancellationToken cancellationToken = default)
         {
             var query = new AircraftQuery(vm);
-
+           
             var aircrafts = await _aircraftRepository.GetAllAsync(
                 query,
                 cancellationToken);
@@ -105,14 +112,67 @@ namespace AirlineReservationSystem.Services.Implementations
         {
             var aircraft = _mapper.Map<Aircraft>(vm);
 
-            await _aircraftRepository.AddAsync(
-                aircraft,
-                cancellationToken);
+          
+            List<FileUploadResult> uploadedFiles = [];
+            if (vm.Images != null && vm.Images.Any())
+            {
+                uploadedFiles = await _fileService.UploadAsync(
+                   vm.Images,
+                   "Images/Aircrafts",
+                   cancellationToken);
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                foreach (var file in uploadedFiles)
+                {
+                    aircraft.Images!.Add(new AircraftImage
+                    {
+                        ImageUrl = file.RelativePath,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType
+                    });
+                }
+            }
+
+          
+            try
+            {
+                await _aircraftRepository.AddAsync(
+                    aircraft,
+                    cancellationToken);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                // توليد 60 مقعد ثابت للطائرة (15 صف، كل صف 4 مقاعد A, B, C, D)
+                var seats = new List<Seat>();
+                char[] seatLetters = { 'A', 'B', 'C', 'D' };
+                int totalRows = 15;
+
+                for (int row = 1; row <= totalRows; row++)
+                {
+                    foreach (var letter in seatLetters)
+                    {
+                        seats.Add(new Seat
+                        {
+                            AircraftId = aircraft.Id,
+                            SeatNumber = $"{row}{letter}", // هيولد: 1A, 1B, 1C, 1D
+                            SeatClass = row <= 3 ? SeatClass.Business : SeatClass.Economy
+                        });
+                    }
+                }
+                await _unitOfWork.Seats.AddRangeAsync(seats, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                foreach (var file in uploadedFiles)
+                {
+                    _fileService.Delete(file.RelativePath);
+                }
+                throw;
+            }
         }
 
         #endregion
+
 
         #region Update
 
@@ -126,7 +186,39 @@ namespace AirlineReservationSystem.Services.Implementations
 
             if (aircraft == null)
                 return false;
+            if (vm.ImagesToDelete != null && vm.ImagesToDelete.Any())
+            {
+                var imagesToDelete = aircraft.Images
+                    .Where(i => vm.ImagesToDelete.Contains(i.Id))
+                    .ToList();
 
+                foreach (var image in imagesToDelete)
+                {
+                    // حذف الملف من wwwroot
+                    _fileService.Delete(image.ImageUrl);
+
+                    // حذف السجل من قاعدة البيانات
+                    _imageRepository.Delete(image);
+                }
+            }
+            // إضافة صور جديدة
+            if (vm.Images != null && vm.Images.Any())
+            {
+                var uploadedFiles = await _fileService.UploadAsync(
+                    vm.Images,
+                    "Images/Aircrafts",
+                    cancellationToken);
+
+                foreach (var file in uploadedFiles)
+                {
+                    aircraft.Images.Add(new AircraftImage
+                    {
+                        ImageUrl = file.RelativePath,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType
+                    });
+                }
+            }
             _mapper.Map(vm, aircraft);
 
             _aircraftRepository.Update(aircraft);

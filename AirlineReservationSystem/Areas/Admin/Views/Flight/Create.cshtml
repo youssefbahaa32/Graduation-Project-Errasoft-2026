@@ -1,0 +1,171 @@
+﻿@model FlightCreateVM
+
+@{
+    ViewData["Title"] = "Add Flight";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+            <i class="fas fa-plane me-2"></i>
+            Add Flight
+        </h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            Flight Information
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="FlightNumber"></label>
+                        <input asp-for="FlightNumber" class="form-control" />
+                        <span asp-validation-for="FlightNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="AircraftId"></label>
+                        <select asp-for="AircraftId"
+                                asp-items="Model.Aircrafts"
+                                class="form-select">
+                            <option value="">-- Select Aircraft --</option>
+                        </select>
+                        <span asp-validation-for="AircraftId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureAirportId"></label>
+                        <select asp-for="DepartureAirportId"
+                                asp-items="Model.Airports"
+                                class="form-select">
+                            <option value="">-- Select Departure Airport --</option>
+                        </select>
+                        <span asp-validation-for="DepartureAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalAirportId"></label>
+                        <select asp-for="ArrivalAirportId"
+                                asp-items="Model.Airports"
+                                class="form-select">
+                            <option value="">-- Select Arrival Airport --</option>
+                        </select>
+                        <span asp-validation-for="ArrivalAirportId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DepartureTime"></label>
+                        <input asp-for="DepartureTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ArrivalTime"></label>
+                        <input asp-for="ArrivalTime"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="ArrivalTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="BasePrice"></label>
+                        <input asp-for="BasePrice"
+                               class="form-control" />
+                        <span asp-validation-for="BasePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status"></label>
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<FlightStatus>()"
+                                class="form-select">
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Images"></label>
+
+                        <input asp-for="Images"
+                               type="file"
+                               multiple
+                               class="form-control"
+                               accept="image/*" />
+
+                        <span asp-validation-for="Images" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div id="preview" class="row mt-3"></div>
+
+                <div class="mt-4">
+
+                    <button class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>
+                        Save
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // كود فحص سريع ومؤقت لمعرفة عدد العناصر الواصلة للـ View
+        console.log("Airports Count in View: ", @(Model.Airports?.Count() ?? 0));
+        console.log("Aircrafts Count in View: ", @(Model.Aircrafts?.Count() ?? 0));
+
+        const input = document.querySelector('input[type=file]');
+        const preview = document.getElementById('preview');
+
+        input.addEventListener('change', function () {
+            preview.innerHTML = '';
+            [...this.files].forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.innerHTML += `
+                        <div class="col-md-2 mb-3">
+                            <img src="${e.target.result}"
+                                 class="img-thumbnail"
+                                 style="height:120px;width:100%;object-fit:cover;">
+                        </div>`;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+}
